@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>新建奖励</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex align-items-center mb-3">
+        <a class="btn btn-outline-secondary btn-sm me-2" th:href="@{/rewards}">← 返回</a>
+        <h4 class="mb-0" th:text="${reward.id == null} ? '新建奖励' : '编辑奖励'">新建奖励</h4>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger py-2 small">⚠️ <span th:text="${error}"></span></div>
+
+    <div class="card">
+        <div class="card-body">
+            <form th:action="${reward.id == null} ? @{/rewards} : @{'/rewards/' + ${reward.id} + '/edit'}"
+                  method="post" enctype="multipart/form-data">
+
+                <label class="form-label">奖励名称</label>
+                <input type="text" class="form-control mb-3" name="name" th:value="${reward.name}"
+                       placeholder="如：选一个玩具" required>
+
+                <label class="form-label">类型</label>
+                <div class="btn-group w-100 mb-3" role="group" aria-label="奖励类型">
+                    <input type="radio" class="btn-check" name="type" id="typePhysical" value="PHYSICAL"
+                           th:checked="${reward.type == null or reward.type == 'PHYSICAL'}">
+                    <label class="btn btn-outline-primary" for="typePhysical">📦 实物</label>
+                    <input type="radio" class="btn-check" name="type" id="typeActivity" value="ACTIVITY"
+                           th:checked="${reward.type == 'ACTIVITY'}">
+                    <label class="btn btn-outline-primary" for="typeActivity">🎡 活动</label>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label">所需积分</label>
+                        <input type="number" class="form-control" name="pointsCost" min="1" required
+                               th:value="${reward.pointsCost == 0} ? '' : ${reward.pointsCost}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">库存 <span class="text-muted small">(空=不限量)</span></label>
+                        <input type="number" class="form-control" name="stock" min="0"
+                               th:value="${reward.stock}">
+                    </div>
+                </div>
+
+                <label class="form-label">说明 <span class="text-muted small">(可选)</span></label>
+                <textarea class="form-control mb-3" name="description" rows="2"
+                          th:text="${reward.description}"></textarea>
+
+                <label class="form-label">图片 <span class="text-muted small">(可选，单张 ≤ 5MB)</span></label>
+                <input type="file" class="form-control mb-2" name="image" accept="image/*">
+                <div th:if="${reward.imagePath}" class="small text-muted mb-3">
+                    当前图片：<img th:src="${reward.imagePath}" class="rounded me-1" style="width:56px;height:56px;object-fit:cover" alt="">
+                    不选择新图则保留
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100" th:text="${reward.id == null} ? '创建奖励' : '保存修改'">保存</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

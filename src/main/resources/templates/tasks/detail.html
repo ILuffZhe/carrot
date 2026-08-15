@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>记录详情</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <a class="btn btn-outline-secondary btn-sm" th:href="@{/tasks}">← 返回列表</a>
+        <h4 class="mb-0">记录详情</h4>
+        <span class="d-inline-block" style="width: 80px"></span>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success py-2 small">✅ <span th:text="${success}"></span></div>
+    <div th:if="${error}" class="alert alert-danger py-2 small">⚠️ <span th:text="${error}"></span></div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h5 class="mb-1" th:text="${task.title}">任务名</h5>
+                    <div class="text-muted small">
+                        <span th:text="${task.taskDate}">2026-08-15</span>
+                        ·
+                        <span th:if="${task.isPositive()}">
+                            正向任务 · 定档：
+                            <span th:switch="${task.tier}">
+                                <span th:case="1">完成</span>
+                                <span th:case="2">良好</span>
+                                <span th:case="3">优秀</span>
+                            </span>
+                        </span>
+                        <span th:if="${!task.isPositive()}">惩罚项</span>
+                        ·
+                        <span th:text="${task.status == 'COMPLETED'} ? '已登记' : '已撤销'"></span>
+                    </div>
+                </div>
+                <div class="fs-4 fw-bold"
+                     th:classappend="${task.earnedPoints >= 0} ? 'text-success' : 'text-danger'"
+                     th:text="${task.earnedPoints >= 0} ? '+' + ${task.earnedPoints} : ${task.earnedPoints}">+5</div>
+            </div>
+            <div th:if="${task.remark}" class="mt-3 pt-2 border-top small">
+                <span class="text-muted">备注：</span><span th:text="${task.remark}"></span>
+            </div>
+            <div th:if="${task.completedAt}" class="mt-1 small text-muted">
+                登记时间：<span th:text="${task.completedAt}"></span>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${!task.photoList().isEmpty()}" class="card mb-3">
+        <div class="card-body">
+            <h6 class="mb-2">完成凭证</h6>
+            <div class="row g-2">
+                <div class="col-4" th:each="p : ${task.photoList()}">
+                    <a th:href="@{${p}}" target="_blank">
+                        <img th:src="@{${p}}" class="img-fluid rounded app-thumb" alt="完成凭证">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h6 class="mb-2">积分流水</h6>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0"
+                    th:each="tx : ${txns}">
+                    <div class="me-2">
+                        <div th:text="${tx.description}">完成任务：刷牙</div>
+                        <div class="small text-muted">
+                            <span th:text="${tx.createdAt}">2026-08-15</span>
+                            ·
+                            <span th:switch="${tx.type}">
+                                <span th:case="'TASK'">任务入账</span>
+                                <span th:case="'PENALTY'">违规扣分</span>
+                                <span th:case="'ADJUST'">冲正调整</span>
+                                <span th:case="'REDEEM'">兑换扣分</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="fw-bold"
+                              th:classappend="${tx.changeAmount >= 0} ? 'text-success' : 'text-danger'"
+                              th:text="${tx.changeAmount >= 0} ? '+' + ${tx.changeAmount} : ${tx.changeAmount}">+5</span>
+                        <div class="small text-muted">余额 <span th:text="${tx.balanceAfter}">0</span></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <form th:if="${task.status == 'COMPLETED'}"
+          th:action="@{'/tasks/' + ${task.id} + '/reverse'}"
+          method="post"
+          onsubmit="return confirm('确认撤销该记录？将追加等额反向冲正流水。');">
+        <button type="submit" class="btn btn-outline-danger w-100">撤销记录（冲正积分）</button>
+    </form>
+</div>
+</body>
+</html>

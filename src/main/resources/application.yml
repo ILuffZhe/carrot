@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: carrot
+
+  datasource:
+    url: jdbc:sqlite:file:./data/carrot.db
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      # SQLite 单写者模型：单连接即可，避免连接池锁竞争
+      maximum-pool-size: 1
+      # SQLite 驱动不支持 HikariCP 默认的 Connection.isValid() 探针，用显式查询代替
+      connection-test-query: SELECT 1
+      # 防止偶发写锁冲突
+      connection-init-sql: PRAGMA busy_timeout=5000
+
+  sql:
+    init:
+      mode: always          # 每次启动执行 schema.sql / data.sql（SQL 均幂等）
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+      encoding: UTF-8
+
+  thymeleaf:
+    cache: false            # 开发期关闭模板缓存，改完立即生效
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 15MB
+
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+server:
+  port: 8080
+
+carrot:
+  # 上传图片根目录（相对运行目录）
+  upload-dir: ./uploads

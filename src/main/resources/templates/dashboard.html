@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>数据看板</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- 当前总积分 -->
+    <div class="card app-balance-card mb-3">
+        <div class="card-body text-center py-4">
+            <div class="text-muted small mb-1">当前总积分</div>
+            <div class="display-5 fw-bold app-stat-value" th:text="${stats.currentBalance}">0</div>
+        </div>
+    </div>
+
+    <!-- 今日概览 -->
+    <div class="row g-2 mb-3">
+        <div class="col-6">
+            <div class="card text-center app-stat-card h-100">
+                <div class="card-body py-3">
+                    <div class="text-muted small mb-1">今日登记</div>
+                    <div class="fs-4 fw-bold"
+                         th:text="${stats.todayPositiveCount + stats.todayNegativeCount}">0</div>
+                    <div class="small text-muted">
+                        完成 <span th:text="${stats.todayPositiveCount}">0</span>
+                        · 违规 <span th:text="${stats.todayNegativeCount}">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card text-center app-stat-card h-100">
+                <div class="card-body py-3">
+                    <div class="text-muted small mb-1">今日净变动</div>
+                    <div class="fs-4 fw-bold"
+                         th:classappend="${stats.todayNetChange >= 0} ? 'text-success' : 'text-danger'"
+                         th:text="${stats.todayNetChange >= 0} ? '+' + ${stats.todayNetChange} : ${stats.todayNetChange}">+0</div>
+                    <div class="small text-muted">入账 − 扣减</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 积分趋势图 -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h6 class="mb-0">积分趋势</h6>
+                <div class="btn-group btn-group-sm" role="group" aria-label="时间范围" id="rangeGroup">
+                    <button type="button" class="btn btn-outline-primary active" data-range="7">7天</button>
+                    <button type="button" class="btn btn-outline-primary" data-range="30">30天</button>
+                </div>
+            </div>
+            <div class="btn-group w-100 btn-group-sm mb-3" role="group" aria-label="展示模式" id="modeGroup">
+                <button type="button" class="btn btn-outline-secondary active" data-mode="net">净变动</button>
+                <button type="button" class="btn btn-outline-secondary" data-mode="split">入账 / 扣减</button>
+            </div>
+            <div class="app-chart-wrap">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近积分流水 -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h6 class="mb-0">最近积分流水</h6>
+                <a class="small text-decoration-none" th:href="@{/tasks}">更多 →</a>
+            </div>
+            <ul class="list-group list-group-flush" th:if="${!stats.recentTransactions.isEmpty()}">
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0"
+                    th:each="tx : ${stats.recentTransactions}">
+                    <div class="me-2 text-truncate">
+                        <div class="text-truncate" th:text="${tx.description}">完成任务：刷牙</div>
+                        <div class="small text-muted">
+                            <span th:text="${tx.createdAt}">2026-08-15 10:00</span>
+                            ·
+                            <span th:switch="${tx.type}">
+                                <span th:case="'TASK'">任务入账</span>
+                                <span th:case="'PENALTY'">违规扣分</span>
+                                <span th:case="'ADJUST'">冲正调整</span>
+                                <span th:case="'REDEEM'">兑换扣分</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-end flex-shrink-0">
+                        <span class="fw-bold"
+                              th:classappend="${tx.changeAmount >= 0} ? 'text-success' : 'text-danger'"
+                              th:text="${tx.changeAmount >= 0} ? '+' + ${tx.changeAmount} : ${tx.changeAmount}">+5</span>
+                        <div class="small text-muted">余额 <span th:text="${tx.balanceAfter}">0</span></div>
+                    </div>
+                </li>
+            </ul>
+            <div th:if="${stats.recentTransactions.isEmpty()}" class="text-center text-muted small py-3">
+                暂无流水，先去记录一次任务吧
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近兑换记录 -->
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h6 class="mb-0">最近兑换记录</h6>
+                <a class="small text-decoration-none" th:href="@{/redemptions}">更多 →</a>
+            </div>
+            <ul class="list-group list-group-flush" th:if="${!stats.recentRedemptions.isEmpty()}">
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0"
+                    th:each="r : ${stats.recentRedemptions}">
+                    <div class="me-2 text-truncate">
+                        <div class="text-truncate" th:text="${r.rewardName}">奖励名</div>
+                        <div class="small text-muted" th:text="${r.redeemedAt}">2026-08-15 10:00</div>
+                    </div>
+                    <div class="text-end flex-shrink-0">
+                        <span class="fw-bold text-danger" th:text="'-' + ${r.pointsCost}">-30</span>
+                        <div class="small">
+                            <span th:switch="${r.status}">
+                                <span th:case="'PENDING'" class="badge bg-warning text-dark">待发放</span>
+                                <span th:case="'DONE'" class="badge bg-success">已发放</span>
+                                <span th:case="'CANCELLED'" class="badge bg-secondary">已取消</span>
+                            </span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <div th:if="${stats.recentRedemptions.isEmpty()}" class="text-center text-muted small py-3">
+                暂无兑换记录
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/vendor/chartjs/chart.umd.min.js}"></script>
+<script th:inline="javascript">
+(function () {
+    const TREND7 = /*[[${stats.trend7}]]*/ [];
+    const TREND30 = /*[[${stats.trend30}]]*/ [];
+    const state = { range: '7', mode: 'net' };
+    const ctx = document.getElementById('trendChart');
+    let chart = null;
+
+    function fmtDate(d) {
+        const parts = d.slice(5).split('-');
+        return parts[0] + '/' + parts[1];
+    }
+
+    function renderChart() {
+        const data = state.range === '30' ? TREND30 : TREND7;
+        const labels = data.map(function (p) { return fmtDate(p.date); });
+        let datasets;
+        if (state.mode === 'net') {
+            datasets = [{
+                label: '净变动',
+                data: data.map(function (p) { return p.net; }),
+                borderColor: '#f47c3c',
+                backgroundColor: 'rgba(244, 124, 60, 0.12)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 2,
+                borderWidth: 2
+            }];
+        } else {
+            datasets = [
+                {
+                    label: '入账',
+                    data: data.map(function (p) { return p.income; }),
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25, 135, 84, 0.08)',
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 2,
+                    borderWidth: 2
+                },
+                {
+                    label: '扣减',
+                    data: data.map(function (p) { return p.deduction; }),
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.08)',
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 2,
+                    borderWidth: 2
+                }
+            ];
+        }
+        if (chart) { chart.destroy(); }
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: labels, datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        display: state.mode === 'split',
+                        position: 'bottom',
+                        labels: { boxWidth: 12, boxHeight: 4, font: { size: 11 } }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { maxTicksLimit: 6, maxRotation: 0, font: { size: 10 } },
+                        grid: { display: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { font: { size: 10 } },
+                        grid: { color: '#f0f0f0' }
+                    }
+                }
+            }
+        });
+    }
+
+    document.querySelectorAll('#rangeGroup button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            state.range = btn.dataset.range;
+            document.querySelectorAll('#rangeGroup button').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            renderChart();
+        });
+    });
+    document.querySelectorAll('#modeGroup button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            state.mode = btn.dataset.mode;
+            document.querySelectorAll('#modeGroup button').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            renderChart();
+        });
+    });
+
+    renderChart();
+})();
+</script>
+</div>
+</body>
+</html>

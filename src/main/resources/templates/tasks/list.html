@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>记录列表</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="mb-0">记录列表</h4>
+        <a class="btn btn-primary" th:href="@{/tasks/record}">＋ 登记</a>
+    </div>
+
+    <div class="d-flex align-items-center mb-3">
+        <span class="text-muted small me-2">当前积分</span>
+        <span class="fs-5 fw-bold app-stat-value" th:text="${currentBalance}">0</span>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success py-2 small">✅ <span th:text="${success}"></span></div>
+    <div th:if="${error}" class="alert alert-danger py-2 small">⚠️ <span th:text="${error}"></span></div>
+
+    <!-- 日期范围筛选 -->
+    <div class="btn-group w-100 mb-2" role="group" aria-label="日期筛选">
+        <a class="btn btn-outline-primary btn-sm"
+           th:classappend="${range == 'today'} ? 'active'"
+           th:href="@{/tasks(range='today', status=${status})}">今日</a>
+        <a class="btn btn-outline-primary btn-sm"
+           th:classappend="${range == 'week'} ? 'active'"
+           th:href="@{/tasks(range='week', status=${status})}">本周</a>
+        <a class="btn btn-outline-primary btn-sm"
+           th:classappend="${range == 'all'} ? 'active'"
+           th:href="@{/tasks(range='all', status=${status})}">全部</a>
+    </div>
+    <!-- 状态筛选 -->
+    <div class="btn-group w-100 mb-3" role="group" aria-label="状态筛选">
+        <a class="btn btn-outline-secondary btn-sm"
+           th:classappend="${status == 'active'} ? 'active'"
+           th:href="@{/tasks(range=${range}, status='active')}">已登记</a>
+        <a class="btn btn-outline-secondary btn-sm"
+           th:classappend="${status == 'cancelled'} ? 'active'"
+           th:href="@{/tasks(range=${range}, status='cancelled')}">已撤销</a>
+        <a class="btn btn-outline-secondary btn-sm"
+           th:classappend="${status == 'all'} ? 'active'"
+           th:href="@{/tasks(range=${range}, status='all')}">全部</a>
+    </div>
+
+    <!-- 正向记录 -->
+    <h5 class="mb-2">
+        ✅ 正向记录
+        <span class="badge bg-light text-secondary align-middle" th:text="${positiveCount}">0</span>
+    </h5>
+    <div class="list-group mb-4">
+        <div class="list-group-item d-flex justify-content-between align-items-center"
+             th:each="t : ${positiveTasks}">
+            <a th:href="@{/tasks/{id}(id=${t.id})}" class="text-decoration-none flex-grow-1 me-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-medium" th:text="${t.title}">任务名</span>
+                    <span class="text-success fw-bold" th:text="'+' + ${t.earnedPoints}">+5</span>
+                </div>
+                <div class="small text-muted">
+                    <span th:text="${t.taskDate}">2026-08-15</span>
+                    ·
+                    <span th:switch="${t.tier}">
+                        <span th:case="1">完成</span>
+                        <span th:case="2">良好</span>
+                        <span th:case="3">优秀</span>
+                    </span>
+                    <span th:if="${t.status == 'CANCELLED'}" class="text-danger ms-1">[已撤销]</span>
+                </div>
+            </a>
+        </div>
+        <div th:if="${positiveCount == 0}" class="list-group-item text-muted text-center small py-4">
+            暂无正向记录
+        </div>
+    </div>
+
+    <!-- 惩罚项 -->
+    <h5 class="mb-2">
+        ⚠️ 惩罚项
+        <span class="badge bg-light text-secondary align-middle" th:text="${negativeCount}">0</span>
+    </h5>
+    <div class="list-group">
+        <div class="list-group-item d-flex justify-content-between align-items-center"
+             th:each="t : ${negativeTasks}">
+            <a th:href="@{/tasks/{id}(id=${t.id})}" class="text-decoration-none flex-grow-1 me-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-medium" th:text="${t.title}">惩罚名</span>
+                    <span class="text-danger fw-bold" th:text="${t.earnedPoints}">-5</span>
+                </div>
+                <div class="small text-muted">
+                    <span th:text="${t.taskDate}">2026-08-15</span>
+                    <span th:if="${t.status == 'CANCELLED'}" class="text-danger ms-1">[已撤销]</span>
+                </div>
+            </a>
+        </div>
+        <div th:if="${negativeCount == 0}" class="list-group-item text-muted text-center small py-4">
+            暂无惩罚记录
+        </div>
+    </div>
+</div>
+</body>
+</html>

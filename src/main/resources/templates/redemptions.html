@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>兑换记录</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h4 class="mb-3">兑换记录</h4>
+
+    <div class="d-flex align-items-center mb-3">
+        <span class="text-muted small me-2">当前积分</span>
+        <span class="fs-5 fw-bold app-stat-value" th:text="${currentBalance}">0</span>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success py-2 small">✅ <span th:text="${success}"></span></div>
+    <div th:if="${error}" class="alert alert-danger py-2 small">⚠️ <span th:text="${error}"></span></div>
+
+    <div class="list-group mb-3">
+        <div class="list-group-item" th:each="r : ${redemptions}">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-medium" th:text="${r.rewardName}">奖励名</span>
+                <span class="text-danger fw-bold" th:text="'-' + ${r.pointsCost}">-30</span>
+            </div>
+            <div class="small text-muted mt-1">
+                <span th:text="${r.redeemedAt}">2026-08-15 10:00</span>
+                <span th:if="${r.note}" class="ms-2" th:text="'备注：' + ${r.note}"></span>
+                <span th:switch="${r.status}" class="ms-2">
+                    <span th:case="'PENDING'" class="badge bg-warning text-dark">待发放</span>
+                    <span th:case="'DONE'" class="badge bg-success">已发放</span>
+                    <span th:case="'CANCELLED'" class="badge bg-secondary">已取消</span>
+                </span>
+            </div>
+            <div th:if="${r.pending}" class="d-flex gap-2 mt-2">
+                <form th:action="@{'/redemptions/' + ${r.id} + '/done'}" method="post" class="flex-grow-1">
+                    <button type="submit" class="btn btn-sm btn-success w-100">✓ 已发放</button>
+                </form>
+                <form th:action="@{'/redemptions/' + ${r.id} + '/cancel'}" method="post" class="flex-grow-1">
+                    <button type="submit" class="btn btn-sm btn-outline-danger w-100"
+                            onclick="return confirm('确认取消？积分将退回')">取消</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(redemptions)}" class="text-center text-muted small py-5">
+        暂无兑换记录
+    </div>
+</div>
+</body>
+</html>

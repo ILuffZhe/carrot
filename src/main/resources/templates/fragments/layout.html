@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title layout:title-pattern="$CONTENT_TITLE · Carrot">Carrot</title>
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<!-- 顶栏：品牌 + 退出（第一行），导航标签（第二行，小屏可横向滑动） -->
+<nav class="navbar navbar-light bg-white border-bottom sticky-top app-navbar">
+    <div class="container-fluid px-3 py-1">
+        <div class="d-flex w-100 align-items-center">
+            <a class="navbar-brand py-1 me-3" th:href="@{/}">🥕 Carrot 积分</a>
+            <form th:action="@{/logout}" method="post" class="ms-auto">
+                <button type="submit" class="btn btn-sm btn-outline-secondary app-btn-nav">退出</button>
+            </form>
+        </div>
+        <div class="app-nav-links d-flex w-100">
+            <a class="app-nav-link"
+               th:classappend="${currentUri == '/'} ? 'active'"
+               th:href="@{/}">看板</a>
+            <a class="app-nav-link"
+               th:classappend="${currentUri.startsWith('/tasks')} ? 'active'"
+               th:href="@{/tasks}">记录</a>
+            <a class="app-nav-link"
+               th:classappend="${currentUri.startsWith('/task-types')} ? 'active'"
+               th:href="@{/task-types}">任务类型</a>
+            <a class="app-nav-link"
+               th:classappend="${currentUri.startsWith('/rewards')} ? 'active'"
+               th:href="@{/rewards}">奖励</a>
+            <a class="app-nav-link"
+               th:classappend="${currentUri.startsWith('/redemptions')} ? 'active'"
+               th:href="@{/redemptions}">兑换</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container py-3 app-main">
+    <div layout:fragment="content"></div>
+</main>
+
+<script th:src="@{/vendor/bootstrap/bootstrap.bundle.min.js}"></script>
+<script>
+// 全局防重复提交：表单提交瞬间禁用提交按钮，避免连点/重复兑换等
+document.addEventListener('submit', function (e) {
+    var btn = e.target.querySelector('button[type="submit"]');
+    if (btn) {
+        btn.disabled = true;
+        btn.classList.add('disabled');
+        btn.dataset.label = btn.dataset.label || btn.textContent;
+        btn.textContent = '请稍候…';
+    }
+}, true);
+</script>
+</body>
+</html>

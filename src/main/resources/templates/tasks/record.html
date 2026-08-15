@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>登记记录</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h4 class="mb-3">登记记录</h4>
+
+    <div th:if="${error}" class="alert alert-danger py-2 small">⚠️ <span th:text="${error}"></span></div>
+
+    <!-- 完成 / 违规 切换 -->
+    <ul class="nav nav-pills nav-fill mb-3" id="kindTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-positive" data-bs-toggle="pill"
+                    data-bs-target="#pane-positive" type="button" role="tab">✅ 记录完成</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-negative" data-bs-toggle="pill"
+                    data-bs-target="#pane-negative" type="button" role="tab">⚠️ 记违规</button>
+        </li>
+    </ul>
+
+    <form th:action="@{/tasks/record}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="kind" id="kind" value="POSITIVE">
+
+        <div class="tab-content">
+            <!-- ===== 正向任务（记录完成） ===== -->
+            <div class="tab-pane fade show active" id="pane-positive" role="tabpanel">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <label class="form-label">任务类型</label>
+                        <select class="form-select" id="positiveType" name="positiveTypeId">
+                            <option value="">✍️ 自定义标题…</option>
+                            <option th:each="t : ${positiveTypes}"
+                                    th:value="${t.id}"
+                                    th:data-base="${t.basePoints}"
+                                    th:data-good="${t.goodPoints}"
+                                    th:data-excellent="${t.excellentPoints}"
+                                    th:text="${t.icon} + ' ' + ${t.name} + '（' + ${t.basePoints} + '/' + ${t.goodPoints} + '/' + ${t.excellentPoints} + '）'"></option>
+                        </select>
+
+                        <div class="mt-2" id="positiveCustomFields" style="display:none">
+                            <input class="form-control mb-2" name="positiveCustomTitle"
+                                   placeholder="自定义任务标题，如：整理书桌">
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <label class="form-label small text-muted">完成档</label>
+                                    <input type="number" class="form-control" name="positiveBasePoints" min="0" value="0">
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label small text-muted">良好档</label>
+                                    <input type="number" class="form-control" name="positiveGoodPoints" min="0" value="0">
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label small text-muted">优秀档</label>
+                                    <input type="number" class="form-control" name="positiveExcellentPoints" min="0" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <label class="form-label mt-3 mb-1">完成档次（定档评分）</label>
+                        <div class="btn-group w-100" role="group" aria-label="定档">
+                            <input type="radio" class="btn-check" name="tier" id="tier1" value="1" checked>
+                            <label class="btn btn-outline-success" for="tier1">完成 <span id="tier1Pts" class="ms-1"></span></label>
+                            <input type="radio" class="btn-check" name="tier" id="tier2" value="2">
+                            <label class="btn btn-outline-success" for="tier2">良好 <span id="tier2Pts" class="ms-1"></span></label>
+                            <input type="radio" class="btn-check" name="tier" id="tier3" value="3">
+                            <label class="btn btn-outline-success" for="tier3">优秀 <span id="tier3Pts" class="ms-1"></span></label>
+                        </div>
+
+                        <label class="form-label mt-3 mb-1">完成凭证（选拍，最多 3 张）</label>
+                        <input type="file" class="form-control" name="photos" accept="image/*"
+                               capture="environment" multiple>
+                        <div class="form-text">手机可直接调用相机拍照，单张不超过 5MB。</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 惩罚项（记违规） ===== -->
+            <div class="tab-pane fade" id="pane-negative" role="tabpanel">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <label class="form-label">惩罚项</label>
+                        <select class="form-select" id="negativeType" name="negativeTypeId">
+                            <option value="">✍️ 自定义标题…</option>
+                            <option th:each="t : ${negativeTypes}"
+                                    th:value="${t.id}"
+                                    th:data-points="${t.basePoints}"
+                                    th:text="${t.icon} + ' ' + ${t.name} + '（-' + ${t.basePoints} + '）'"></option>
+                        </select>
+
+                        <div class="mt-2" id="negativeCustomFields" style="display:none">
+                            <input class="form-control mb-2" name="negativeCustomTitle"
+                                   placeholder="自定义违规标题，如：乱扔垃圾">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label small text-muted">单次扣分</label>
+                                    <input type="number" class="form-control" name="negativePoints" min="1" value="5">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-danger py-2 small mt-3 mb-0">
+                            本次将扣 <span id="negativePreview" class="fw-bold"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <label class="form-label">执行日期</label>
+                <input type="date" class="form-control" name="taskDate" th:value="${today}">
+                <label class="form-label mt-3">备注（可选）</label>
+                <input class="form-control" name="remark" placeholder="如：表现很主动">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg w-100">确认登记</button>
+    </form>
+
+    <script th:inline="javascript">
+(function () {
+    const kindInput = document.getElementById('kind');
+    const posTypeSel = document.getElementById('positiveType');
+    const negTypeSel = document.getElementById('negativeType');
+
+    // 完成/违规 切换：同步隐藏字段 kind
+    document.querySelectorAll('#kindTabs .nav-link').forEach(function (tab) {
+        tab.addEventListener('shown.bs.tab', function () {
+            kindInput.value = tab.id === 'tab-negative' ? 'NEGATIVE' : 'POSITIVE';
+        });
+    });
+
+    function updatePositivePreview() {
+        let base = '', good = '', excellent = '';
+        const customFields = document.getElementById('positiveCustomFields');
+        if (posTypeSel.value === '') {
+            customFields.style.display = 'block';
+            base = document.querySelector('input[name=positiveBasePoints]').value;
+            good = document.querySelector('input[name=positiveGoodPoints]').value;
+            excellent = document.querySelector('input[name=positiveExcellentPoints]').value;
+        } else {
+            customFields.style.display = 'none';
+            const opt = posTypeSel.selectedOptions[0];
+            base = opt.dataset.base;
+            good = opt.dataset.good;
+            excellent = opt.dataset.excellent;
+        }
+        document.getElementById('tier1Pts').textContent = base !== '' ? '+' + base : '';
+        document.getElementById('tier2Pts').textContent = good !== '' ? '+' + good : '';
+        document.getElementById('tier3Pts').textContent = excellent !== '' ? '+' + excellent : '';
+    }
+
+    function updateNegativePreview() {
+        let pts;
+        const customFields = document.getElementById('negativeCustomFields');
+        if (negTypeSel.value === '') {
+            customFields.style.display = 'block';
+            pts = document.querySelector('input[name=negativePoints]').value;
+        } else {
+            customFields.style.display = 'none';
+            pts = negTypeSel.selectedOptions[0].dataset.points;
+        }
+        document.getElementById('negativePreview').textContent = pts ? '-' + pts + ' 分' : '';
+    }
+
+    posTypeSel.addEventListener('change', updatePositivePreview);
+    negTypeSel.addEventListener('change', updateNegativePreview);
+    document.querySelectorAll('#positiveCustomFields input').forEach(function (input) {
+        input.addEventListener('input', updatePositivePreview);
+    });
+    document.querySelectorAll('#negativeCustomFields input').forEach(function (input) {
+        input.addEventListener('input', updateNegativePreview);
+    });
+
+    updatePositivePreview();
+    updateNegativePreview();
+})();
+</script>
+</div>
+</body>
+</html>
