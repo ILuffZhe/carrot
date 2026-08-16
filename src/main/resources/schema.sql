@@ -12,6 +12,15 @@ CREATE TABLE IF NOT EXISTS users (
     created_at    TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 
+-- 记住我（Remember-Me）持久化令牌表：登录页勾选「记住我」后写入，
+-- 30 天内打开页面自动登录（令牌入库，应用重启后依然有效；退出登录即删除）
+CREATE TABLE IF NOT EXISTS persistent_logins (
+    username  VARCHAR(64) NOT NULL,
+    series    VARCHAR(64) PRIMARY KEY,
+    token     VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP NOT NULL
+);
+
 -- 任务类型表（系统内置 + 自定义）
 CREATE TABLE IF NOT EXISTS task_types (
     id               INTEGER PRIMARY KEY AUTOINCREMENT,
