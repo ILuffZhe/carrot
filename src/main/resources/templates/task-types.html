@@ -28,8 +28,9 @@
                     </div>
                     <div class="small text-muted">
                         <span th:if="${t.kind == 'POSITIVE'}"
-                              th:text="'完成 ' + ${t.basePoints} + ' · 良好 ' + ${t.goodPoints} + ' · 优秀 ' + ${t.excellentPoints}"></span>
-                        <span th:if="${t.kind == 'NEGATIVE'}" th:text="'单次扣 ' + ${t.basePoints} + ' 分'"></span>
+                              th:text="'完成 ' + ${@pointFormat.fmt(t.basePoints)} + ' · 良好 ' + ${@pointFormat.fmt(t.goodPoints)} + ' · 优秀 ' + ${@pointFormat.fmt(t.excellentPoints)}"></span>
+                        <span th:if="${t.kind == 'NEGATIVE'}"
+                              th:text="'单次扣 ' + ${@pointFormat.fmt(t.basePoints)} + ' 分'"></span>
                         <span th:if="${t.description}" class="ms-2" th:text="${t.description}"></span>
                     </div>
                 </div>

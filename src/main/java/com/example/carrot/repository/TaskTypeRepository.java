@@ -83,9 +83,9 @@ public class TaskTypeRepository {
             ps.setString(2, type.getKind());
             ps.setString(3, type.getDescription());
             ps.setString(4, type.getIcon());
-            ps.setInt(5, type.getBasePoints());
-            ps.setInt(6, type.getGoodPoints());
-            ps.setInt(7, type.getExcellentPoints());
+            ps.setDouble(5, type.getBasePoints());
+            ps.setDouble(6, type.getGoodPoints());
+            ps.setDouble(7, type.getExcellentPoints());
             return ps;
         }, keyHolder);
         Number key = keyHolder.getKey();

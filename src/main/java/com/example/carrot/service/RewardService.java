@@ -39,13 +39,13 @@ public class RewardService {
      */
     @Transactional
     public Reward create(String name, String type, String description,
-                         Integer pointsCost, Integer stock, MultipartFile image) {
+                         Double pointsCost, Integer stock, MultipartFile image) {
         Reward reward = validateAndBuild(null, name, type, description, pointsCost, stock);
         reward.setImagePath(imageStore.save(image, "rewards"));
         reward.setEnabled(true);
         reward.setId(rewardRepository.insert(reward));
         OpsLogger.log("新建奖励", String.format(
-                "id=%d 名称=%s 类型=%s 积分=%d 库存=%s",
+                "id=%d 名称=%s 类型=%s 积分=%.2f 库存=%s",
                 reward.getId(), reward.getName(), reward.getType(),
                 reward.getPointsCost(), reward.getStock() == null ? "不限" : reward.getStock()));
         return reward;
@@ -56,13 +56,13 @@ public class RewardService {
      */
     @Transactional
     public void update(Long id, String name, String type, String description,
-                       Integer pointsCost, Integer stock, MultipartFile image) {
+                       Double pointsCost, Integer stock, MultipartFile image) {
         Reward reward = validateAndBuild(id, name, type, description, pointsCost, stock);
         String newImage = imageStore.save(image, "rewards");
         reward.setImagePath(newImage != null ? newImage : reward.getImagePath());
         rewardRepository.update(reward);
         OpsLogger.log("编辑奖励", String.format(
-                "id=%d 名称=%s 积分=%d 库存=%s",
+                "id=%d 名称=%s 积分=%.2f 库存=%s",
                 id, reward.getName(), reward.getPointsCost(),
                 reward.getStock() == null ? "不限" : reward.getStock()));
     }
@@ -78,7 +78,7 @@ public class RewardService {
     }
 
     private Reward validateAndBuild(Long id, String name, String type, String description,
-                                    Integer pointsCost, Integer stock) {
+                                    Double pointsCost, Integer stock) {
         name = name == null ? "" : name.trim();
         if (name.isEmpty()) {
             throw new IllegalArgumentException("请填写奖励名称");

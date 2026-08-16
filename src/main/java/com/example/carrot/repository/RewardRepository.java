@@ -53,7 +53,7 @@ public class RewardRepository {
                     new String[]{"id"});
             ps.setString(1, reward.getName());
             ps.setString(2, reward.getDescription());
-            ps.setInt(3, reward.getPointsCost());
+            ps.setDouble(3, reward.getPointsCost());
             ps.setString(4, reward.getType());
             ps.setString(5, reward.getImagePath());
             if (reward.getStock() == null) {

@@ -30,10 +30,10 @@ public class PointRepository {
     /**
      * 当前余额 = 最近一条流水的 balance_after；无流水时为 0。
      */
-    public int getCurrentBalance() {
-        Integer balance = jdbcTemplate.queryForObject(
+    public double getCurrentBalance() {
+        Double balance = jdbcTemplate.queryForObject(
                 "SELECT COALESCE((SELECT balance_after FROM point_transactions ORDER BY id DESC LIMIT 1), 0)",
-                Integer.class);
+                Double.class);
         return balance == null ? 0 : balance;
     }
 
@@ -59,11 +59,30 @@ public class PointRepository {
     /**
      * 某日（YYYY-MM-DD）净积分变动合计。
      */
-    public int sumChangeOn(String date) {
-        Integer sum = jdbcTemplate.queryForObject(
+    public double sumChangeOn(String date) {
+        Double sum = jdbcTemplate.queryForObject(
                 "SELECT COALESCE(SUM(change_amount), 0) FROM point_transactions WHERE date(created_at) = ?",
-                Integer.class, date);
+                Double.class, date);
         return sum == null ? 0 : sum;
+    }
+
+    /**
+     * 上次利息结算日期（YYYY-MM-DD）；无记录返回 null（调用方回退为当天）。
+     */
+    public String getLastAccrualDate() {
+        return jdbcTemplate.query(
+                "SELECT last_accrual_date FROM interest_state WHERE id = 1",
+                rs -> rs.next() ? rs.getString(1) : null);
+    }
+
+    /**
+     * 更新上次利息结算日期（upsert，单行 id=1）。
+     */
+    public void updateLastAccrualDate(String date) {
+        jdbcTemplate.update(
+                "INSERT INTO interest_state (id, last_accrual_date) VALUES (1, ?) "
+              + "ON CONFLICT(id) DO UPDATE SET last_accrual_date = excluded.last_accrual_date",
+                date);
     }
 
     /**

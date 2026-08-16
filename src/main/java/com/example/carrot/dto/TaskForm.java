@@ -12,15 +12,15 @@ public class TaskForm {
     // 正向任务（记录完成）
     private Long positiveTypeId;            // 为空时使用自定义标题
     private String positiveCustomTitle;
-    private Integer positiveBasePoints;
-    private Integer positiveGoodPoints;
-    private Integer positiveExcellentPoints;
+    private Double positiveBasePoints;
+    private Double positiveGoodPoints;
+    private Double positiveExcellentPoints;
     private Integer tier;                   // 1=完成 2=良好 3=优秀
 
     // 惩罚项（记违规）
     private Long negativeTypeId;
     private String negativeCustomTitle;
-    private Integer negativePoints;         // 单次扣分值（正数）
+    private Double negativePoints;          // 单次扣分值（正数）
 
     // 公共
     private String taskDate;                // YYYY-MM-DD
@@ -50,27 +50,27 @@ public class TaskForm {
         this.positiveCustomTitle = positiveCustomTitle;
     }
 
-    public Integer getPositiveBasePoints() {
+    public Double getPositiveBasePoints() {
         return positiveBasePoints;
     }
 
-    public void setPositiveBasePoints(Integer positiveBasePoints) {
+    public void setPositiveBasePoints(Double positiveBasePoints) {
         this.positiveBasePoints = positiveBasePoints;
     }
 
-    public Integer getPositiveGoodPoints() {
+    public Double getPositiveGoodPoints() {
         return positiveGoodPoints;
     }
 
-    public void setPositiveGoodPoints(Integer positiveGoodPoints) {
+    public void setPositiveGoodPoints(Double positiveGoodPoints) {
         this.positiveGoodPoints = positiveGoodPoints;
     }
 
-    public Integer getPositiveExcellentPoints() {
+    public Double getPositiveExcellentPoints() {
         return positiveExcellentPoints;
     }
 
-    public void setPositiveExcellentPoints(Integer positiveExcellentPoints) {
+    public void setPositiveExcellentPoints(Double positiveExcellentPoints) {
         this.positiveExcellentPoints = positiveExcellentPoints;
     }
 
@@ -98,11 +98,11 @@ public class TaskForm {
         this.negativeCustomTitle = negativeCustomTitle;
     }
 
-    public Integer getNegativePoints() {
+    public Double getNegativePoints() {
         return negativePoints;
     }
 
-    public void setNegativePoints(Integer negativePoints) {
+    public void setNegativePoints(Double negativePoints) {
         this.negativePoints = negativePoints;
     }
 

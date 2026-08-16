@@ -14,7 +14,8 @@
 
     <div class="d-flex align-items-center mb-3">
         <span class="text-muted small me-2">当前积分</span>
-        <span class="fs-5 fw-bold app-stat-value" th:text="${currentBalance}">0</span>
+        <span class="fs-5 fw-bold app-stat-value"
+              th:text="${@pointFormat.fmt(currentBalance)}">0</span>
     </div>
 
     <div th:if="${success}" class="alert alert-success py-2 small">✅ <span th:text="${success}"></span></div>
@@ -32,7 +33,8 @@
                         <span th:if="${r.type == 'ACTIVITY'}" class="badge bg-light text-secondary flex-shrink-0">🎡 活动</span>
                     </div>
                     <div class="d-flex align-items-baseline my-1">
-                        <span class="fs-5 fw-bold app-reward-cost" th:text="${r.pointsCost}">100</span>
+                        <span class="fs-5 fw-bold app-reward-cost"
+                              th:text="${@pointFormat.fmt(r.pointsCost)}">100</span>
                         <span class="text-muted small ms-1">分</span>
                         <span th:if="${!r.enabled}" class="badge bg-dark ms-auto">已下架</span>
                     </div>

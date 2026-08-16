@@ -41,9 +41,9 @@ public class TaskTypeController {
                          @RequestParam String name,
                          @RequestParam(required = false) String icon,
                          @RequestParam(required = false) String description,
-                         @RequestParam(required = false) Integer basePoints,
-                         @RequestParam(required = false) Integer goodPoints,
-                         @RequestParam(required = false) Integer excellentPoints,
+                         @RequestParam(required = false) Double basePoints,
+                         @RequestParam(required = false) Double goodPoints,
+                         @RequestParam(required = false) Double excellentPoints,
                          RedirectAttributes ra) {
         try {
             TaskType type = taskTypeService.create(kind, name, icon, description,
@@ -71,9 +71,9 @@ public class TaskTypeController {
                        @RequestParam String name,
                        @RequestParam(required = false) String icon,
                        @RequestParam(required = false) String description,
-                       @RequestParam(required = false) Integer basePoints,
-                       @RequestParam(required = false) Integer goodPoints,
-                       @RequestParam(required = false) Integer excellentPoints,
+                       @RequestParam(required = false) Double basePoints,
+                       @RequestParam(required = false) Double goodPoints,
+                       @RequestParam(required = false) Double excellentPoints,
                        RedirectAttributes ra) {
         try {
             taskTypeService.update(id, kind, name, icon, description,

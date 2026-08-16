@@ -84,7 +84,7 @@ COMPLETED（登记即完成，积分生效）--家长撤销--> CANCELLED（已�
 
 ### 2.4 积分与账本
 
-- 积分变动共四种来源：
+- 积分变动共五种来源：
 
   | 类型 | 场景 | change_amount |
   | --- | --- | --- |
@@ -92,9 +92,18 @@ COMPLETED（登记即完成，积分生效）--家长撤销--> CANCELLED（已�
   | `PENALTY` | 记录违规扣分 | 负数 |
   | `REDEEM` | 兑换奖励扣分 | 负数 |
   | `ADJUST` | 手工调整 / 兑换取消退分 / 任务记录撤销冲正 | 可正可负 |
+  | `INTEREST` | 账户积分按年化利率复利增长（按天复利） | 正数 |
 
 - 所有变动都写入 `point_transactions` 流水表，**只追加、不修改、不删除**；当前余额 = 最近一条流水的 `balance_after`。
 - 需要撤销某笔变动时，追加一条等额反方向记录（冲正），而不是直接删记录。
+
+**小数精度**：积分支持 2 位小数（录入、存储、显示全链路），账本 `change_amount` / `balance_after` 统一保留 2 位小数（HALF_UP）。显示上去尾零：`5` 显示 `5`，`5.5` 显示 `5.5`，`5.25` 显示 `5.25`。
+
+**账户利息（按天复利）**：
+- 年化利率配置在 `application.yml` 的 `carrot.interest-rate`（默认 `0.02`，即年化 2%），无页面配置项。
+- **惰性结算，无需调度器**：每次加/减积分或查询余额时，用 `interest_state.last_accrual_date` 结算自上次结算日至今的利息，单条 `INTEREST` 流水覆盖整个间隔天数。
+- 复利公式：日利率 = 年化/365，`new_balance = round2(balance × (1 + 年化/365)^天数)`，`interest = round2(new_balance - balance)`（对余额舍入，避免逐日舍入的系统偏差）。
+- 余额 ≤ 0 时只推进结算日期，不产生流水；同一天重复查询为 no-op（幂等）。
 
 ### 2.5 奖励兑换
 
@@ -151,9 +160,9 @@ CREATE TABLE task_types (
     kind             TEXT NOT NULL DEFAULT 'POSITIVE',  -- POSITIVE=正向任务 / NEGATIVE=惩罚项
     description      TEXT,
     icon             TEXT,                          -- emoji，如 🧹📚
-    base_points      INTEGER NOT NULL DEFAULT 0,    -- 正向：完成档积分；惩罚：单次扣分值（存正数）
-    good_points      INTEGER NOT NULL DEFAULT 0,    -- 良好档积分（惩罚项不使用）
-    excellent_points INTEGER NOT NULL DEFAULT 0,    -- 优秀档积分（惩罚项不使用）
+    base_points      REAL NOT NULL DEFAULT 0,    -- 正向：完成档积分；惩罚：单次扣分值（存正数）
+    good_points      REAL NOT NULL DEFAULT 0,    -- 良好档积分（惩罚项不使用）
+    excellent_points REAL NOT NULL DEFAULT 0,    -- 优秀档积分（惩罚项不使用）
     is_builtin       INTEGER NOT NULL DEFAULT 0,    -- 1=系统内置
     enabled          INTEGER NOT NULL DEFAULT 1,    -- 1=启用
     created_at       TEXT NOT NULL DEFAULT (datetime('now','localtime'))
@@ -165,12 +174,12 @@ CREATE TABLE tasks (
     task_type_id     INTEGER REFERENCES task_types(id),  -- 可为 NULL（自定义标题记录）
     title            TEXT NOT NULL,                      -- 冗余标题快照
     description      TEXT,
-    base_points      INTEGER NOT NULL DEFAULT 0,         -- 三档积分快照（登记时固化）
-    good_points      INTEGER NOT NULL DEFAULT 0,
-    excellent_points INTEGER NOT NULL DEFAULT 0,
+    base_points      REAL NOT NULL DEFAULT 0,         -- 三档积分快照（登记时固化）
+    good_points      REAL NOT NULL DEFAULT 0,
+    excellent_points REAL NOT NULL DEFAULT 0,
     status           TEXT NOT NULL DEFAULT 'COMPLETED',  -- COMPLETED=已登记生效（正向入账或惩罚扣分均生效）/ CANCELLED=已撤销，积分冲正
     tier             INTEGER,                            -- 正向定档：1=完成 2=良好 3=优秀
-    earned_points    INTEGER,                            -- 实际入账/扣减积分（正负，生效后非空）
+    earned_points    REAL,                            -- 实际入账/扣减积分（正负，生效后非空）
     task_date        TEXT NOT NULL,                      -- 任务执行/完成日期 YYYY-MM-DD（默认当天，可回填）
     completed_at     TEXT,                               -- 家长登记入系统时间
     photo_paths      TEXT,                               -- JSON 数组，相对路径，如 ["/uploads/tasks/202608/xxx.jpg"]
@@ -185,7 +194,7 @@ CREATE TABLE rewards (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     name        TEXT NOT NULL,
     description TEXT,
-    points_cost INTEGER NOT NULL,
+    points_cost REAL NOT NULL,
     type        TEXT NOT NULL DEFAULT 'PHYSICAL',        -- PHYSICAL(实物) / ACTIVITY(活动)
     image_path  TEXT,                                    -- 相对路径
     stock       INTEGER,                                 -- NULL=不限量
@@ -198,7 +207,7 @@ CREATE TABLE redemptions (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     reward_id    INTEGER NOT NULL REFERENCES rewards(id),
     reward_name  TEXT NOT NULL,                          -- 冗余快照
-    points_cost  INTEGER NOT NULL,                       -- 冗余快照
+    points_cost  REAL NOT NULL,                       -- 冗余快照
     status       TEXT NOT NULL DEFAULT 'PENDING',        -- PENDING / DONE / CANCELLED
     redeemed_at  TEXT NOT NULL DEFAULT (datetime('now','localtime')),
     completed_at TEXT,
@@ -211,14 +220,20 @@ CREATE INDEX idx_redemptions_status ON redemptions(status);
 -- 积分流水表（唯一账本，只追加）
 CREATE TABLE point_transactions (
     id             INTEGER PRIMARY KEY AUTOINCREMENT,
-    change_amount  INTEGER NOT NULL,                     -- 正=入账 负=扣减
-    balance_after  INTEGER NOT NULL,                     -- 变动后余额
-    type           TEXT NOT NULL,                        -- TASK / PENALTY / REDEEM / ADJUST
+    change_amount  REAL NOT NULL,                     -- 正=入账 负=扣减
+    balance_after  REAL NOT NULL,                     -- 变动后余额
+    type           TEXT NOT NULL,                        -- TASK / PENALTY / REDEEM / ADJUST / INTEREST
     ref_id         INTEGER,                              -- 关联 tasks.id 或 redemptions.id
     description    TEXT,                                 -- 如「完成任务：刷牙」「兑换：玩具小汽车」
     created_at     TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 CREATE INDEX idx_point_txn_created ON point_transactions(created_at);
+
+-- 利息结算状态（单行表，id=1）：惰性按天复利的上次结算日期
+CREATE TABLE interest_state (
+    id                INTEGER PRIMARY KEY CHECK (id = 1),
+    last_accrual_date TEXT NOT NULL                       -- YYYY-MM-DD，上次利息结算日
+);
 ```
 
 ### 3.2 关键设计说明

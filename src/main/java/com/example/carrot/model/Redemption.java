@@ -8,7 +8,7 @@ public class Redemption {
     private Long id;
     private Long rewardId;
     private String rewardName;  // 冗余快照
-    private int pointsCost;     // 冗余快照
+    private double pointsCost;  // 冗余快照
     private String status;      // PENDING=待发放 / DONE=已发放 / CANCELLED=已取消（退回积分）
     private String redeemedAt;  // 发起兑换时间
     private String completedAt; // 发放/取消时间
@@ -44,11 +44,11 @@ public class Redemption {
         this.rewardName = rewardName;
     }
 
-    public int getPointsCost() {
+    public double getPointsCost() {
         return pointsCost;
     }
 
-    public void setPointsCost(int pointsCost) {
+    public void setPointsCost(double pointsCost) {
         this.pointsCost = pointsCost;
     }
 

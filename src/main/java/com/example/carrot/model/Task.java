@@ -16,12 +16,12 @@ public class Task {
     private Long taskTypeId;
     private String title;          // 冗余标题快照
     private String description;
-    private int basePoints;        // 三档积分快照
-    private int goodPoints;
-    private int excellentPoints;
+    private double basePoints;     // 三档积分快照
+    private double goodPoints;
+    private double excellentPoints;
     private String status;         // COMPLETED=已登记生效 / CANCELLED=已撤销
     private Integer tier;          // 正向定档：1=完成 2=良好 3=优秀；惩罚项为 null
-    private Integer earnedPoints;  // 实际入账/扣减积分（正负）
+    private Double earnedPoints;   // 实际入账/扣减积分（正负，可空）
     private String taskDate;       // 执行日期 YYYY-MM-DD
     private String completedAt;    // 登记入系统时间
     private String photoPaths;     // JSON 数组
@@ -78,27 +78,27 @@ public class Task {
         this.description = description;
     }
 
-    public int getBasePoints() {
+    public double getBasePoints() {
         return basePoints;
     }
 
-    public void setBasePoints(int basePoints) {
+    public void setBasePoints(double basePoints) {
         this.basePoints = basePoints;
     }
 
-    public int getGoodPoints() {
+    public double getGoodPoints() {
         return goodPoints;
     }
 
-    public void setGoodPoints(int goodPoints) {
+    public void setGoodPoints(double goodPoints) {
         this.goodPoints = goodPoints;
     }
 
-    public int getExcellentPoints() {
+    public double getExcellentPoints() {
         return excellentPoints;
     }
 
-    public void setExcellentPoints(int excellentPoints) {
+    public void setExcellentPoints(double excellentPoints) {
         this.excellentPoints = excellentPoints;
     }
 
@@ -118,11 +118,11 @@ public class Task {
         this.tier = tier;
     }
 
-    public Integer getEarnedPoints() {
+    public Double getEarnedPoints() {
         return earnedPoints;
     }
 
-    public void setEarnedPoints(Integer earnedPoints) {
+    public void setEarnedPoints(Double earnedPoints) {
         this.earnedPoints = earnedPoints;
     }
 

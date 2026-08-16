@@ -11,7 +11,8 @@
 
     <div class="d-flex align-items-center mb-3">
         <span class="text-muted small me-2">当前积分</span>
-        <span class="fs-5 fw-bold app-stat-value" th:text="${currentBalance}">0</span>
+        <span class="fs-5 fw-bold app-stat-value"
+              th:text="${@pointFormat.fmt(currentBalance)}">0</span>
     </div>
 
     <div th:if="${success}" class="alert alert-success py-2 small">✅ <span th:text="${success}"></span></div>
@@ -21,7 +22,8 @@
         <div class="list-group-item" th:each="r : ${redemptions}">
             <div class="d-flex justify-content-between align-items-center">
                 <span class="fw-medium" th:text="${r.rewardName}">奖励名</span>
-                <span class="text-danger fw-bold" th:text="'-' + ${r.pointsCost}">-30</span>
+                <span class="text-danger fw-bold"
+                      th:text="'-' + ${@pointFormat.fmt(r.pointsCost)}">-30</span>
             </div>
             <div class="small text-muted mt-1">
                 <span th:text="${r.redeemedAt}">2026-08-15 10:00</span>
