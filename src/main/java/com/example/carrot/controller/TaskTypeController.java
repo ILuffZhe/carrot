@@ -30,6 +30,12 @@ public class TaskTypeController {
         return "task-types";
     }
 
+    @GetMapping("/new")
+    public String createForm(Model model) {
+        model.addAttribute("type", new TaskType());
+        return "task-type-form";
+    }
+
     @PostMapping
     public String create(@RequestParam String kind,
                          @RequestParam String name,
@@ -43,6 +49,36 @@ public class TaskTypeController {
             TaskType type = taskTypeService.create(kind, name, icon, description,
                     basePoints, goodPoints, excellentPoints);
             ra.addFlashAttribute("success", "已新建任务类型：" + type.getName());
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/task-types";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("type", taskTypeService.getById(id));
+        } catch (IllegalArgumentException e) {
+            return "redirect:/task-types";
+        }
+        return "task-type-form";
+    }
+
+    @PostMapping("/{id}/edit")
+    public String edit(@PathVariable Long id,
+                       @RequestParam String kind,
+                       @RequestParam String name,
+                       @RequestParam(required = false) String icon,
+                       @RequestParam(required = false) String description,
+                       @RequestParam(required = false) Integer basePoints,
+                       @RequestParam(required = false) Integer goodPoints,
+                       @RequestParam(required = false) Integer excellentPoints,
+                       RedirectAttributes ra) {
+        try {
+            taskTypeService.update(id, kind, name, icon, description,
+                    basePoints, goodPoints, excellentPoints);
+            ra.addFlashAttribute("success", "任务类型已更新：" + name.trim());
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("error", e.getMessage());
         }

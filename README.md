@@ -67,7 +67,7 @@ java -jar target/carrot-1.0-SNAPSHOT.jar
 | 数据看板（首页） | `/` |
 | 记录列表（今日 / 本周 / 全部 × 已登记 / 已撤销） | `/tasks` |
 | 登记记录（完成 / 违规） | `/tasks/record` |
-| 任务类型管理 | `/task-types` |
+| 任务类型管理（新建 / 编辑 / 停用） | `/task-types` |
 | 奖励列表 / 兑换 | `/rewards` |
 | 兑换记录 | `/redemptions` |
 

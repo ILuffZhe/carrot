@@ -7,58 +7,13 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <h4 class="mb-3">任务类型管理</h4>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="mb-0">任务类型管理</h4>
+        <a class="btn btn-primary" th:href="@{/task-types/new}">＋ 新建类型</a>
+    </div>
 
     <div th:if="${success}" class="alert alert-success py-2 small">✅ <span th:text="${success}"></span></div>
     <div th:if="${error}" class="alert alert-danger py-2 small">⚠️ <span th:text="${error}"></span></div>
-
-    <!-- 新建类型 -->
-    <div class="card mb-4">
-        <div class="card-header bg-white">＋ 新建类型</div>
-        <div class="card-body">
-            <form th:action="@{/task-types}" method="post">
-                <div class="btn-group w-100 mb-3" role="group" aria-label="类型">
-                    <input type="radio" class="btn-check" name="kind" id="kindPos" value="POSITIVE" checked>
-                    <label class="btn btn-outline-primary" for="kindPos">✅ 正向任务</label>
-                    <input type="radio" class="btn-check" name="kind" id="kindNeg" value="NEGATIVE">
-                    <label class="btn btn-outline-primary" for="kindNeg">⚠️ 惩罚项</label>
-                </div>
-
-                <input type="text" class="form-control mb-2" name="name" placeholder="名称，如：整理书桌" required>
-                <div class="row g-2 mb-2">
-                    <div class="col-3">
-                        <input type="text" class="form-control text-center" name="icon" placeholder="图标" maxlength="4">
-                    </div>
-                    <div class="col-9">
-                        <input type="text" class="form-control" name="description" placeholder="说明（可选）">
-                    </div>
-                </div>
-
-                <div class="row g-2" id="positivePointsFields">
-                    <div class="col-4">
-                        <label class="form-label small text-muted">完成档积分</label>
-                        <input type="number" class="form-control" name="basePoints" min="0" value="5">
-                    </div>
-                    <div class="col-4">
-                        <label class="form-label small text-muted">良好档积分</label>
-                        <input type="number" class="form-control" name="goodPoints" min="0" value="6">
-                    </div>
-                    <div class="col-4">
-                        <label class="form-label small text-muted">优秀档积分</label>
-                        <input type="number" class="form-control" name="excellentPoints" min="0" value="8">
-                    </div>
-                </div>
-                <div class="row g-2" id="negativePointsFields" style="display:none">
-                    <div class="col-4">
-                        <label class="form-label small text-muted">单次扣分</label>
-                        <input type="number" class="form-control" name="basePoints" min="1" value="5" disabled>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100 mt-3">新建类型</button>
-            </form>
-        </div>
-    </div>
 
     <!-- 类型列表 -->
     <div class="list-group">
@@ -78,35 +33,17 @@
                         <span th:if="${t.description}" class="ms-2" th:text="${t.description}"></span>
                     </div>
                 </div>
-                <form th:action="@{'/task-types/' + ${t.id} + '/toggle'}" method="post" class="flex-shrink-0">
-                    <button type="submit" class="btn btn-sm"
-                            th:classappend="${t.enabled} ? 'btn-outline-secondary' : 'btn-outline-success'"
-                            th:text="${t.enabled} ? '停用' : '启用'"></button>
-                </form>
+                <div class="d-flex gap-2 flex-shrink-0">
+                    <a class="btn btn-sm btn-outline-secondary" th:href="@{'/task-types/' + ${t.id} + '/edit'}">编辑</a>
+                    <form th:action="@{'/task-types/' + ${t.id} + '/toggle'}" method="post" class="m-0">
+                        <button type="submit" class="btn btn-sm"
+                                th:classappend="${t.enabled} ? 'btn-outline-secondary' : 'btn-outline-success'"
+                                th:text="${t.enabled} ? '停用' : '启用'"></button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-
-    <script>
-(function () {
-    const posRadio = document.getElementById('kindPos');
-    const negRadio = document.getElementById('kindNeg');
-    const posFields = document.getElementById('positivePointsFields');
-    const negFields = document.getElementById('negativePointsFields');
-
-    function syncKind() {
-        const positive = posRadio.checked;
-        posFields.style.display = positive ? '' : 'none';
-        negFields.style.display = positive ? 'none' : '';
-        // 只启用当前类型对应的积分输入，避免同名 basePoints 冲突提交
-        posFields.querySelectorAll('input').forEach(function (i) { i.disabled = !positive; });
-        negFields.querySelectorAll('input').forEach(function (i) { i.disabled = positive; });
-    }
-    posRadio.addEventListener('change', syncKind);
-    negRadio.addEventListener('change', syncKind);
-    syncKind();
-})();
-    </script>
 </div>
 </body>
 </html>

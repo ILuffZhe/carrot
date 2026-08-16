@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>任务类型</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex align-items-center mb-3">
+        <a class="btn btn-outline-secondary btn-sm me-2" th:href="@{/task-types}">← 返回</a>
+        <h4 class="mb-0" th:text="${type.id == null} ? '新建类型' : '编辑类型'">新建类型</h4>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger py-2 small">⚠️ <span th:text="${error}"></span></div>
+
+    <div class="card">
+        <div class="card-body">
+            <form th:action="${type.id == null} ? @{/task-types} : @{'/task-types/' + ${type.id} + '/edit'}"
+                  method="post">
+
+                <div class="btn-group w-100 mb-3" role="group" aria-label="类型">
+                    <input type="radio" class="btn-check" name="kind" id="kindPos" value="POSITIVE"
+                           th:checked="${type.kind == null or type.kind == 'POSITIVE'}">
+                    <label class="btn btn-outline-primary" for="kindPos">✅ 正向任务</label>
+                    <input type="radio" class="btn-check" name="kind" id="kindNeg" value="NEGATIVE"
+                           th:checked="${type.kind == 'NEGATIVE'}">
+                    <label class="btn btn-outline-primary" for="kindNeg">⚠️ 惩罚项</label>
+                </div>
+
+                <input type="text" class="form-control mb-2" name="name" placeholder="名称，如：整理书桌"
+                       th:value="${type.name}" required>
+                <div class="row g-2 mb-2">
+                    <div class="col-3">
+                        <input type="text" class="form-control text-center" name="icon" placeholder="图标"
+                               maxlength="4" th:value="${type.icon}">
+                    </div>
+                    <div class="col-9">
+                        <input type="text" class="form-control" name="description" placeholder="说明（可选）"
+                               th:value="${type.description}">
+                    </div>
+                </div>
+
+                <div class="row g-2" id="positivePointsFields">
+                    <div class="col-4">
+                        <label class="form-label small text-muted">完成档积分</label>
+                        <input type="number" class="form-control" name="basePoints" min="0"
+                               th:value="${type.id == null ? 5 : type.basePoints}">
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label small text-muted">良好档积分</label>
+                        <input type="number" class="form-control" name="goodPoints" min="0"
+                               th:value="${type.id == null ? 6 : type.goodPoints}">
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label small text-muted">优秀档积分</label>
+                        <input type="number" class="form-control" name="excellentPoints" min="0"
+                               th:value="${type.id == null ? 8 : type.excellentPoints}">
+                    </div>
+                </div>
+                <div class="row g-2" id="negativePointsFields" style="display:none">
+                    <div class="col-4">
+                        <label class="form-label small text-muted">单次扣分</label>
+                        <input type="number" class="form-control" name="basePoints" min="1"
+                               th:value="${type.id == null ? 5 : type.basePoints}" disabled>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mt-3"
+                        th:text="${type.id == null} ? '新建类型' : '保存修改'">保存</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        const posRadio = document.getElementById('kindPos');
+        const negRadio = document.getElementById('kindNeg');
+        const posFields = document.getElementById('positivePointsFields');
+        const negFields = document.getElementById('negativePointsFields');
+
+        function syncKind() {
+            const positive = posRadio.checked;
+            posFields.style.display = positive ? '' : 'none';
+            negFields.style.display = positive ? 'none' : '';
+            // 只启用当前类型对应的积分输入，避免同名 basePoints 冲突提交
+            posFields.querySelectorAll('input').forEach(function (i) { i.disabled = !positive; });
+            negFields.querySelectorAll('input').forEach(function (i) { i.disabled = positive; });
+        }
+        posRadio.addEventListener('change', syncKind);
+        negRadio.addEventListener('change', syncKind);
+        syncKind();
+    })();
+    </script>
+</div>
+</body>
+</html>
