@@ -66,6 +66,9 @@
                         <span th:case="2">良好</span>
                         <span th:case="3">优秀</span>
                     </span>
+                    ·
+                    <span th:text="'👤 ' + ${t.createdBy}" th:if="${t.createdBy != null}">👤 dad</span>
+                    <span th:if="${t.createdBy == null}">👤 —</span>
                     <span th:if="${t.status == 'CANCELLED'}" class="text-danger ms-1">[已撤销]</span>
                 </div>
             </a>
@@ -90,6 +93,9 @@
                 </div>
                 <div class="small text-muted">
                     <span th:text="${t.taskDate}">2026-08-15</span>
+                    ·
+                    <span th:text="'👤 ' + ${t.createdBy}" th:if="${t.createdBy != null}">👤 dad</span>
+                    <span th:if="${t.createdBy == null}">👤 —</span>
                     <span th:if="${t.status == 'CANCELLED'}" class="text-danger ms-1">[已撤销]</span>
                 </div>
             </a>

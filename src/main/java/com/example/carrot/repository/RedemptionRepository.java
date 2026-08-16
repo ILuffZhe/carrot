@@ -19,7 +19,7 @@ import java.util.Optional;
 public class RedemptionRepository {
 
     private static final String SELECT =
-            "SELECT id, reward_id, reward_name, points_cost, status, redeemed_at, completed_at, note, created_at "
+            "SELECT id, reward_id, reward_name, points_cost, status, redeemed_at, completed_at, note, created_by, created_at "
           + "FROM redemptions";
     private static final RowMapper<Redemption> MAPPER =
             BeanPropertyRowMapper.newInstance(Redemption.class);
@@ -43,12 +43,13 @@ public class RedemptionRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO redemptions (reward_id, reward_name, points_cost, status) "
-                  + "VALUES (?, ?, ?, 'PENDING')",
+                    "INSERT INTO redemptions (reward_id, reward_name, points_cost, status, created_by) "
+                  + "VALUES (?, ?, ?, 'PENDING', ?)",
                     new String[]{"id"});
             ps.setLong(1, redemption.getRewardId());
             ps.setString(2, redemption.getRewardName());
             ps.setInt(3, redemption.getPointsCost());
+            ps.setString(4, redemption.getCreatedBy());
             return ps;
         }, keyHolder);
         Number key = keyHolder.getKey();

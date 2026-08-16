@@ -1,6 +1,7 @@
 package com.example.carrot.service;
 
 import com.example.carrot.dto.TaskForm;
+import com.example.carrot.log.OpsLogger;
 import com.example.carrot.model.Task;
 import com.example.carrot.model.TaskType;
 import com.example.carrot.repository.TaskRepository;
@@ -133,6 +134,7 @@ public class TaskService {
         task.setTaskDate(taskDate);
         task.setPhotoPaths(photoJson);
         task.setRemark(trimToNull(form.getRemark()));
+        task.setCreatedBy(OpsLogger.currentUsername());
         task.setId(taskRepository.insert(task));
 
         String txnType = "POSITIVE".equals(kind) ? "TASK" : "PENALTY";

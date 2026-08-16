@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     completed_at     TEXT,                               -- 家长登记入系统时间
     photo_paths      TEXT,                               -- JSON 数组，相对路径
     remark           TEXT,                               -- 家长备注
+    created_by       TEXT,                               -- 操作人用户名（登记人；历史数据为 NULL）
     created_at       TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 CREATE INDEX IF NOT EXISTS idx_tasks_status_date ON tasks(status, task_date);
@@ -79,6 +80,7 @@ CREATE TABLE IF NOT EXISTS redemptions (
     redeemed_at  TEXT NOT NULL DEFAULT (datetime('now','localtime')),
     completed_at TEXT,
     note         TEXT,
+    created_by   TEXT,                                   -- 操作人用户名（兑换发起人；历史数据为 NULL）
     created_at   TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 CREATE INDEX IF NOT EXISTS idx_redemptions_status ON redemptions(status);

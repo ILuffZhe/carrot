@@ -13,6 +13,7 @@ public class Redemption {
     private String redeemedAt;  // 发起兑换时间
     private String completedAt; // 发放/取消时间
     private String note;
+    private String createdBy;   // 操作人用户名（兑换发起人；历史数据为 null）
     private String createdAt;
 
     public boolean isPending() {
@@ -81,6 +82,14 @@ public class Redemption {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     public String getCreatedAt() {

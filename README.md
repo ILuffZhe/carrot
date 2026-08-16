@@ -49,7 +49,15 @@ java -jar target/carrot-1.0-SNAPSHOT.jar
 
 ### 默认账号
 
-首次启动自动创建：`admin` / `admin123`（建议首次登录后自行修改密码）。
+首次启动自动创建三个账号（初始密码均为 `admin123`，建议登录后自行修改密码）：
+
+| 账号 | 说明 |
+| --- | --- |
+| `admin` | 家长（通用） |
+| `dad` | 爸爸 |
+| `mom` | 妈妈 |
+
+各账号以用户名登录，操作日志会记录操作人用户名，便于区分「是谁做了什么」。
 
 ## 主要页面
 
@@ -103,5 +111,5 @@ carrot/
 ## 常见问题
 
 - **手机拍照后上传被拒**：单张不超过 5MB，单次最多 3 张。
-- **登录后回到登录页**：检查是否用了 `admin / admin123`；密码重置需直接改 `data/carrot.db` 中 `users.password_hash` 的 BCrypt 值。
+- **登录后回到登录页**：检查是否用了 `admin` / `dad` / `mom` 且密码为 `admin123`；密码重置需直接改 `data/carrot.db` 中 `users.password_hash` 的 BCrypt 值。
 - **想从头初始化**：停止应用，删除 `data/` 与 `uploads/`，重新 `java -jar` 即可（会自动重建种子数据）。

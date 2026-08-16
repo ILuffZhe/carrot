@@ -62,6 +62,7 @@ public class RedemptionService {
         redemption.setRewardName(reward.getName());
         redemption.setPointsCost(reward.getPointsCost());
         redemption.setStatus("PENDING");
+        redemption.setCreatedBy(OpsLogger.currentUsername());
         redemption.setId(redemptionRepository.insert(redemption));
 
         pointService.add(-reward.getPointsCost(), "REDEEM", redemption.getId(),
