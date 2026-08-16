@@ -26,6 +26,7 @@ public class Task {
     private String completedAt;    // 登记入系统时间
     private String photoPaths;     // JSON 数组
     private String remark;
+    private String createdBy;      // 操作人用户名（登记人；历史数据为 null）
     private String createdAt;
 
     /** 解析照片相对路径数组，供模板展示。 */
@@ -155,6 +156,14 @@ public class Task {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     public String getCreatedAt() {

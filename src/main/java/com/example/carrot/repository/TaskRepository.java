@@ -21,7 +21,7 @@ public class TaskRepository {
 
     private static final String SELECT =
             "SELECT id, task_type_id, title, description, base_points, good_points, excellent_points, "
-          + "status, tier, earned_points, task_date, completed_at, photo_paths, remark, created_at FROM tasks";
+          + "status, tier, earned_points, task_date, completed_at, photo_paths, remark, created_by, created_at FROM tasks";
     private static final RowMapper<Task> MAPPER = BeanPropertyRowMapper.newInstance(Task.class);
 
     private final JdbcTemplate jdbcTemplate;
@@ -35,8 +35,8 @@ public class TaskRepository {
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement(
                     "INSERT INTO tasks (task_type_id, title, description, base_points, good_points, excellent_points, "
-                  + "status, tier, earned_points, task_date, completed_at, photo_paths, remark) "
-                  + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now','localtime'), ?, ?)",
+                  + "status, tier, earned_points, task_date, completed_at, photo_paths, remark, created_by) "
+                  + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now','localtime'), ?, ?, ?)",
                     new String[]{"id"});
             ps.setObject(1, task.getTaskTypeId());
             ps.setString(2, task.getTitle());
@@ -50,6 +50,7 @@ public class TaskRepository {
             ps.setString(10, task.getTaskDate());
             ps.setString(11, task.getPhotoPaths());
             ps.setString(12, task.getRemark());
+            ps.setString(13, task.getCreatedBy());
             return ps;
         }, keyHolder);
         Number key = keyHolder.getKey();

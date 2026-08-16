@@ -115,7 +115,7 @@ COMPLETED（登记即完成，积分生效）--家长撤销--> CANCELLED（已�
 ### 2.7 认证
 
 - Spring Security 表单登录，密码 BCrypt 加密存储。
-- 首次启动种子一个管理员账号 `admin`（初始密码 `admin123`，建议首次登录后修改）。
+- 首次启动种子 `admin` / `dad` / `mom` 三个账号（初始密码均 `admin123`，建议登录后修改）；操作日志以登录用户名区分操作人。
 - 所有页面除 `/login` 和静态资源外均需登录访问。
 - 登录页可选「记住我」：勾选后向 `persistent_logins` 写入持久化令牌，30 天内打开页面自动登录（令牌入库，应用重启仍有效）；退出登录即失效。
 - 登录页会自动记住上次输入的用户名（localStorage），密码不落地存储。
@@ -175,6 +175,7 @@ CREATE TABLE tasks (
     completed_at     TEXT,                               -- 家长登记入系统时间
     photo_paths      TEXT,                               -- JSON 数组，相对路径，如 ["/uploads/tasks/202608/xxx.jpg"]
     remark           TEXT,                               -- 家长备注
+    created_by       TEXT,                               -- 操作人用户名（登记人；历史数据为 NULL）
     created_at       TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 CREATE INDEX idx_tasks_status_date ON tasks(status, task_date);
@@ -202,6 +203,7 @@ CREATE TABLE redemptions (
     redeemed_at  TEXT NOT NULL DEFAULT (datetime('now','localtime')),
     completed_at TEXT,
     note         TEXT,
+    created_by   TEXT,                                   -- 操作人用户名（兑换发起人；历史数据为 NULL）
     created_at   TEXT NOT NULL DEFAULT (datetime('now','localtime'))
 );
 CREATE INDEX idx_redemptions_status ON redemptions(status);
@@ -270,7 +272,7 @@ CREATE INDEX idx_point_txn_created ON point_transactions(created_at);
 | 周末去游乐场 | 活动 | 200  |
 
 
-**初始账号**：`admin` / `admin123`（BCrypt 加密后写入 `users`）。
+**初始账号**：`admin` / `dad` / `mom`，初始密码均 `admin123`（BCrypt 加密后写入 `users`，各账号独立哈希）。
 
 ---
 
@@ -447,7 +449,7 @@ carrot:
 3. 打包部署：`mvn package -DskipTests` → `java -jar target/carrot-1.0-SNAPSHOT.jar`。
 4. 访问：`http://localhost:8080`（手机在同一 WiFi 下访问 `http://<Mac 局域网 IP>:8080`）。
 5. 数据目录：首次启动自动生成 `./data/carrot.db` 与 `./uploads/`，**备份时打包这两个目录即可**。
-6. 默认账号：`admin` / `admin123`，登录后建议修改密码。
+6. 默认账号：`admin` / `dad` / `mom`，初始密码均 `admin123`，登录后建议修改密码。
 
 ---
 

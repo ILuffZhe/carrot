@@ -25,6 +25,8 @@
             </div>
             <div class="small text-muted mt-1">
                 <span th:text="${r.redeemedAt}">2026-08-15 10:00</span>
+                <span class="ms-2" th:text="'👤 ' + ${r.createdBy}" th:if="${r.createdBy != null}">👤 dad</span>
+                <span class="ms-2" th:if="${r.createdBy == null}">👤 —</span>
                 <span th:if="${r.note}" class="ms-2" th:text="'备注：' + ${r.note}"></span>
                 <span th:switch="${r.status}" class="ms-2">
                     <span th:case="'PENDING'" class="badge bg-warning text-dark">待发放</span>

@@ -3,9 +3,16 @@
 -- 设计文档 docs/design.md 3.4
 -- ============================================================
 
--- 初始管理员账号：admin / admin123（BCrypt）
+-- 初始账号：admin / dad / mom，初始密码均为 admin123（BCrypt），
+-- 各自登录后操作日志以用户名区分（dad=爸爸 / mom=妈妈）
 INSERT OR IGNORE INTO users (username, password_hash, display_name)
 VALUES ('admin', '$2y$10$HLLD/hPcsSNnmuUbot/V2uQkWFErY4DvgvmkYlvEFb.ni5PZdTfPG', '家长');
+
+INSERT OR IGNORE INTO users (username, password_hash, display_name)
+VALUES ('dad', '$2y$10$QqNnVBsM2HfvrQrrdfAOq.GhXNhC97xBkvALW297UCpr3db1porSC', '爸爸');
+
+INSERT OR IGNORE INTO users (username, password_hash, display_name)
+VALUES ('mom', '$2y$10$/e/xWlCqr2ECoDBRPhroQ.bbH8akQqGia30J3o6YvMQNmeX.Nd/oy', '妈妈');
 
 -- ============================================================
 -- 内置正向任务类型（POSITIVE）：完成档 / 良好档 / 优秀档
