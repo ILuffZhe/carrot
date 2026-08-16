@@ -39,3 +39,5 @@ server:
 carrot:
   # 上传图片根目录（相对运行目录）
   upload-dir: ./uploads
+  # 记住我令牌签名密钥（家庭内网单机使用，默认值足够；如需可改为任意随机串）
+  remember-me-key: carrot-home-remember-me-key

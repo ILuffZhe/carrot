@@ -117,6 +117,8 @@ COMPLETED（登记即完成，积分生效）--家长撤销--> CANCELLED（已�
 - Spring Security 表单登录，密码 BCrypt 加密存储。
 - 首次启动种子一个管理员账号 `admin`（初始密码 `admin123`，建议首次登录后修改）。
 - 所有页面除 `/login` 和静态资源外均需登录访问。
+- 登录页可选「记住我」：勾选后向 `persistent_logins` 写入持久化令牌，30 天内打开页面自动登录（令牌入库，应用重启仍有效）；退出登录即失效。
+- 登录页会自动记住上次输入的用户名（localStorage），密码不落地存储。
 
 ---
 
@@ -132,6 +134,14 @@ CREATE TABLE users (
     password_hash TEXT NOT NULL,                    -- BCrypt
     display_name  TEXT NOT NULL,
     created_at    TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+);
+
+-- 记住我令牌表（勾选「记住我」后写入，30 天内免登录）
+CREATE TABLE persistent_logins (
+    username  VARCHAR(64) NOT NULL,
+    series    VARCHAR(64) PRIMARY KEY,
+    token     VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP NOT NULL
 );
 
 -- 任务类型表（系统内置 + 自定义）
@@ -270,7 +280,7 @@ CREATE INDEX idx_point_txn_created ON point_transactions(created_at);
 
 | 页面 | 路径 | 说明 |
 | --- | --- | --- |
-| 登录页 | `login.html` | 用户名 + 密码表单 |
+| 登录页 | `login.html` | 用户名 + 密码表单、「记住我」免登录、记住用户名 |
 | 看板（首页） | `dashboard.html` | 当前积分、今日概览、7/30 天趋势图、最近流水、最近兑换 |
 | 记录列表 | `tasks/list.html` | 今日 / 本周 / 全部 与状态（已登记/已撤销）筛选，正向与惩罚项分开展示 |
 | 记录完成 / 记违规 | `tasks/record.html` | 选择任务类型或惩罚项、执行日期、定档 / 确认扣分、拍照、备注，一键登记 |
@@ -409,6 +419,7 @@ carrot:
 - `formLogin().loginPage("/login").defaultSuccessUrl("/", true)`。
 - `authorizeHttpRequests`：`/login`、`/css/**`、`/js/**`、`/img/**`、`/uploads/**` 放行，其余需认证。
 - 密码用 `BCryptPasswordEncoder`；种子账号密码也以 BCrypt 写入。
+- `rememberMe()`：登录页勾选「记住我」后，`JdbcTokenRepositoryImpl` 向 `persistent_logins` 表写入持久化令牌，`tokenValiditySeconds=30天`，关闭浏览器后打开页面仍自动登录；退出登录时令牌随会话一并清除。
 
 **看板趋势图**
 - DashboardController 查询近 30 天每日积分变动，按 `SUM(change_amount)` 得每日净变动，同时按 `type IN ('TASK','PENALTY')` 拆分「入账 / 扣减」两条序列，把 7 天与 30 天两组数据放入 model。
