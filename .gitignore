@@ -1,7 +1,9 @@
 target/
-# 运行时生成的数据目录（备份时手动打包这两个目录）
+# 运行时生成的数据/日志目录（备份时手动打包这几个目录）
 data/
 uploads/
+logs/
+log/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

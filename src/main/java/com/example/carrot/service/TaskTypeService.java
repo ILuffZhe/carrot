@@ -1,5 +1,6 @@
 package com.example.carrot.service;
 
+import com.example.carrot.log.OpsLogger;
 import com.example.carrot.model.TaskType;
 import com.example.carrot.repository.TaskTypeRepository;
 import org.springframework.stereotype.Service;
@@ -74,7 +75,11 @@ public class TaskTypeService {
         type.setExcellentPoints(excellentPoints == null ? 0 : excellentPoints);
         type.setBuiltin(false);
         type.setEnabled(true);
-        taskTypeRepository.insert(type);
+        type.setId(taskTypeRepository.insert(type));
+        OpsLogger.log("新建任务类型", String.format(
+                "id=%d 类型=%s 名称=%s 三档积分=%d/%d/%d",
+                type.getId(), kind, type.getName(),
+                type.getBasePoints(), type.getGoodPoints(), type.getExcellentPoints()));
         return type;
     }
 
@@ -84,5 +89,7 @@ public class TaskTypeService {
             throw new IllegalArgumentException("任务类型不存在");
         }
         taskTypeRepository.toggleEnabled(id);
+        boolean enabled = taskTypeRepository.findById(id).orElseThrow().isEnabled();
+        OpsLogger.log(enabled ? "启用任务类型" : "停用任务类型", "id=" + id);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.carrot.service;
 
+import com.example.carrot.log.OpsLogger;
 import com.example.carrot.model.PointTransaction;
 import com.example.carrot.repository.PointRepository;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,9 @@ public class PointService {
         txn.setRefId(refId);
         txn.setDescription(description);
         pointRepository.insert(txn);
+        OpsLogger.log("积分流水", String.format(
+                "type=%s change=%+d balance=%d refId=%s | %s",
+                type, changeAmount, txn.getBalanceAfter(), refId, description));
         return txn;
     }
 

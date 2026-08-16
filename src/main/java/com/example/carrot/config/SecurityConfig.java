@@ -1,5 +1,6 @@
 package com.example.carrot.config;
 
+import com.example.carrot.log.OpsLogger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -30,6 +31,12 @@ public class SecurityConfig {
                 .permitAll())
             .logout(logout -> logout
                 .logoutSuccessUrl("/login?logout")
+                // 自定义 LogoutHandler 在会话失效前记录操作人（默认处理器在其之后执行）
+                .addLogoutHandler((request, response, authentication) -> {
+                    if (authentication != null) {
+                        OpsLogger.log("退出登录", "user=" + authentication.getName());
+                    }
+                })
                 .permitAll());
         return http.build();
     }

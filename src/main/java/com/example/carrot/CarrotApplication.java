@@ -18,6 +18,9 @@ public class CarrotApplication {
         // 确保数据目录存在（SQLite 不会自动创建父目录）
         Path dataDir = Paths.get("data");
         Files.createDirectories(dataDir);
+        // 确保日志目录存在（logback 也会自动创建，这里显式创建更稳妥）
+        Path logDir = Paths.get("logs");
+        Files.createDirectories(logDir);
         SpringApplication.run(CarrotApplication.class, args);
     }
 }

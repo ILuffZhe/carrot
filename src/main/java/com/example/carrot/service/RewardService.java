@@ -1,5 +1,6 @@
 package com.example.carrot.service;
 
+import com.example.carrot.log.OpsLogger;
 import com.example.carrot.model.Reward;
 import com.example.carrot.repository.RewardRepository;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,10 @@ public class RewardService {
         reward.setImagePath(imageStore.save(image, "rewards"));
         reward.setEnabled(true);
         reward.setId(rewardRepository.insert(reward));
+        OpsLogger.log("新建奖励", String.format(
+                "id=%d 名称=%s 类型=%s 积分=%d 库存=%s",
+                reward.getId(), reward.getName(), reward.getType(),
+                reward.getPointsCost(), reward.getStock() == null ? "不限" : reward.getStock()));
         return reward;
     }
 
@@ -56,6 +61,10 @@ public class RewardService {
         String newImage = imageStore.save(image, "rewards");
         reward.setImagePath(newImage != null ? newImage : reward.getImagePath());
         rewardRepository.update(reward);
+        OpsLogger.log("编辑奖励", String.format(
+                "id=%d 名称=%s 积分=%d 库存=%s",
+                id, reward.getName(), reward.getPointsCost(),
+                reward.getStock() == null ? "不限" : reward.getStock()));
     }
 
     @Transactional
@@ -64,6 +73,8 @@ public class RewardService {
             throw new IllegalArgumentException("奖励不存在");
         }
         rewardRepository.toggleEnabled(id);
+        boolean enabled = rewardRepository.findById(id).orElseThrow().isEnabled();
+        OpsLogger.log(enabled ? "启用奖励" : "停用奖励", "id=" + id);
     }
 
     private Reward validateAndBuild(Long id, String name, String type, String description,

@@ -1,5 +1,6 @@
 package com.example.carrot.service;
 
+import com.example.carrot.log.OpsLogger;
 import com.example.carrot.model.Redemption;
 import com.example.carrot.model.Reward;
 import com.example.carrot.repository.RedemptionRepository;
@@ -65,6 +66,8 @@ public class RedemptionService {
 
         pointService.add(-reward.getPointsCost(), "REDEEM", redemption.getId(),
                 "兑换：" + reward.getName());
+        OpsLogger.log("发起兑换", String.format(
+                "id=%d 奖励=%s 积分=%d", redemption.getId(), reward.getName(), reward.getPointsCost()));
         return redemption;
     }
 
@@ -78,6 +81,8 @@ public class RedemptionService {
             throw new IllegalArgumentException("只有待发放的兑换可以标记发放");
         }
         redemptionRepository.updateStatus(id, "DONE");
+        OpsLogger.log("兑换发放", String.format(
+                "id=%d 奖励=%s 积分=%d", id, redemption.getRewardName(), redemption.getPointsCost()));
     }
 
     /**
