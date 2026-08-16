@@ -8,7 +8,7 @@ public class RewardForm {
     private String name;
     private String type;        // PHYSICAL=实物 / ACTIVITY=活动
     private String description;
-    private Integer pointsCost; // 所需积分
+    private Double pointsCost;  // 所需积分
     private Integer stock;      // 库存，null=不限量
 
     public String getName() {
@@ -35,11 +35,11 @@ public class RewardForm {
         this.description = description;
     }
 
-    public Integer getPointsCost() {
+    public Double getPointsCost() {
         return pointsCost;
     }
 
-    public void setPointsCost(Integer pointsCost) {
+    public void setPointsCost(Double pointsCost) {
         this.pointsCost = pointsCost;
     }
 

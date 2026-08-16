@@ -10,20 +10,20 @@ import java.util.List;
  */
 public class DashboardStats {
 
-    private int currentBalance;
+    private double currentBalance;
     private int todayPositiveCount;   // 今日完成任务数
     private int todayNegativeCount;   // 今日违规数
-    private int todayNetChange;       // 今日积分净变动
+    private double todayNetChange;    // 今日积分净变动
     private List<TrendPoint> trend7;
     private List<TrendPoint> trend30;
     private List<PointTransaction> recentTransactions; // 最近 10 条
     private List<Redemption> recentRedemptions;        // 最近 5 条
 
-    public int getCurrentBalance() {
+    public double getCurrentBalance() {
         return currentBalance;
     }
 
-    public void setCurrentBalance(int currentBalance) {
+    public void setCurrentBalance(double currentBalance) {
         this.currentBalance = currentBalance;
     }
 
@@ -43,11 +43,11 @@ public class DashboardStats {
         this.todayNegativeCount = todayNegativeCount;
     }
 
-    public int getTodayNetChange() {
+    public double getTodayNetChange() {
         return todayNetChange;
     }
 
-    public void setTodayNetChange(int todayNetChange) {
+    public void setTodayNetChange(double todayNetChange) {
         this.todayNetChange = todayNetChange;
     }
 

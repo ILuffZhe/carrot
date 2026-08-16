@@ -62,8 +62,8 @@ public class TaskService {
         }
         String kind = form.getKind();
         String title;
-        int base = 0, good = 0, excellent = 0;
-        int earned;
+        double base = 0, good = 0, excellent = 0;
+        double earned;
         Integer tier = null;
 
         if ("POSITIVE".equals(kind)) {
@@ -95,7 +95,7 @@ public class TaskService {
                 default -> excellent;
             };
         } else if ("NEGATIVE".equals(kind)) {
-            int points;
+            double points;
             if (form.getNegativeTypeId() != null) {
                 TaskType type = loadEnabled(form.getNegativeTypeId(), "NEGATIVE");
                 points = type.getBasePoints();
@@ -258,7 +258,7 @@ public class TaskService {
         return s == null ? null : (s.isBlank() ? null : s.trim());
     }
 
-    private int nvl(Integer i) {
+    private double nvl(Double i) {
         return i == null ? 0 : i;
     }
 }

@@ -36,7 +36,7 @@
                 <div class="row g-2 mb-3">
                     <div class="col-6">
                         <label class="form-label">所需积分</label>
-                        <input type="number" class="form-control" name="pointsCost" min="1" required
+                        <input type="number" class="form-control" name="pointsCost" min="1" step="0.01" required
                                th:value="${reward.pointsCost == 0} ? '' : ${reward.pointsCost}">
                     </div>
                     <div class="col-6">

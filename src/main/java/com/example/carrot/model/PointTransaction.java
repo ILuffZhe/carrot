@@ -6,9 +6,9 @@ package com.example.carrot.model;
 public class PointTransaction {
 
     private Long id;
-    private int changeAmount;   // 正=入账 负=扣减
-    private int balanceAfter;   // 变动后余额
-    private String type;        // TASK / PENALTY / REDEEM / ADJUST
+    private double changeAmount;  // 正=入账 负=扣减
+    private double balanceAfter;  // 变动后余额
+    private String type;        // TASK / PENALTY / REDEEM / ADJUST / INTEREST
     private Long refId;         // 关联 tasks.id 或 redemptions.id
     private String description;
     private String createdAt;
@@ -21,19 +21,19 @@ public class PointTransaction {
         this.id = id;
     }
 
-    public int getChangeAmount() {
+    public double getChangeAmount() {
         return changeAmount;
     }
 
-    public void setChangeAmount(int changeAmount) {
+    public void setChangeAmount(double changeAmount) {
         this.changeAmount = changeAmount;
     }
 
-    public int getBalanceAfter() {
+    public double getBalanceAfter() {
         return balanceAfter;
     }
 
-    public void setBalanceAfter(int balanceAfter) {
+    public void setBalanceAfter(double balanceAfter) {
         this.balanceAfter = balanceAfter;
     }
 

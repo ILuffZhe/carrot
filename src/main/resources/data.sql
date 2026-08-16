@@ -82,3 +82,9 @@ WHERE NOT EXISTS (SELECT 1 FROM rewards WHERE name = '选一个玩具');
 INSERT INTO rewards (name, description, points_cost, type)
 SELECT '周末去游乐场', '周末安排去游乐场玩', 200, 'ACTIVITY'
 WHERE NOT EXISTS (SELECT 1 FROM rewards WHERE name = '周末去游乐场');
+
+-- ============================================================
+-- 利息结算状态：首次启动时写入，仅首次生效（重启不重置）
+-- ============================================================
+INSERT OR IGNORE INTO interest_state (id, last_accrual_date)
+VALUES (1, date('now','localtime'));

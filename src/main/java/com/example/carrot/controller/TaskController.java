@@ -5,6 +5,7 @@ import com.example.carrot.model.Task;
 import com.example.carrot.service.PointService;
 import com.example.carrot.service.TaskService;
 import com.example.carrot.service.TaskTypeService;
+import com.example.carrot.util.PointFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,13 +32,16 @@ public class TaskController {
     private final TaskService taskService;
     private final TaskTypeService taskTypeService;
     private final PointService pointService;
+    private final PointFormat pointFormat;
 
     public TaskController(TaskService taskService,
                           TaskTypeService taskTypeService,
-                          PointService pointService) {
+                          PointService pointService,
+                          PointFormat pointFormat) {
         this.taskService = taskService;
         this.taskTypeService = taskTypeService;
         this.pointService = pointService;
+        this.pointFormat = pointFormat;
     }
 
     @GetMapping
@@ -76,9 +80,8 @@ public class TaskController {
                          RedirectAttributes ra) {
         try {
             Task task = taskService.record(form, photos);
-            String sign = task.getEarnedPoints() >= 0 ? "+" : "";
             ra.addFlashAttribute("success",
-                    "登记成功，" + sign + task.getEarnedPoints() + " 积分已入账");
+                    "登记成功，" + pointFormat.fmtSigned(task.getEarnedPoints()) + " 积分已入账");
             return "redirect:/tasks/" + task.getId();
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("error", e.getMessage());

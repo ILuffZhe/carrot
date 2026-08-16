@@ -11,9 +11,9 @@ public class TaskType {
     private String kind;          // POSITIVE / NEGATIVE
     private String description;
     private String icon;          // emoji
-    private int basePoints;       // 正向：完成档；惩罚：单次扣分值（正数）
-    private int goodPoints;       // 良好档（惩罚项不使用）
-    private int excellentPoints;  // 优秀档（惩罚项不使用）
+    private double basePoints;       // 正向：完成档；惩罚：单次扣分值（正数）
+    private double goodPoints;       // 良好档（惩罚项不使用）
+    private double excellentPoints;  // 优秀档（惩罚项不使用）
     private boolean builtin;      // 1=系统内置（查询时用别名 is_builtin AS builtin）
     private boolean enabled;      // 1=启用
     private String createdAt;
@@ -62,27 +62,27 @@ public class TaskType {
         this.icon = icon;
     }
 
-    public int getBasePoints() {
+    public double getBasePoints() {
         return basePoints;
     }
 
-    public void setBasePoints(int basePoints) {
+    public void setBasePoints(double basePoints) {
         this.basePoints = basePoints;
     }
 
-    public int getGoodPoints() {
+    public double getGoodPoints() {
         return goodPoints;
     }
 
-    public void setGoodPoints(int goodPoints) {
+    public void setGoodPoints(double goodPoints) {
         this.goodPoints = goodPoints;
     }
 
-    public int getExcellentPoints() {
+    public double getExcellentPoints() {
         return excellentPoints;
     }
 
-    public void setExcellentPoints(int excellentPoints) {
+    public void setExcellentPoints(double excellentPoints) {
         this.excellentPoints = excellentPoints;
     }
 

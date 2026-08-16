@@ -41,14 +41,14 @@ public class TaskTypeService {
      */
     @Transactional
     public TaskType create(String kind, String name, String icon, String description,
-                           Integer basePoints, Integer goodPoints, Integer excellentPoints) {
+                           Double basePoints, Double goodPoints, Double excellentPoints) {
         TaskType type = validateAndBuild(null, kind, name, icon, description,
                 basePoints, goodPoints, excellentPoints);
         type.setBuiltin(false);
         type.setEnabled(true);
         type.setId(taskTypeRepository.insert(type));
         OpsLogger.log("新建任务类型", String.format(
-                "id=%d 类型=%s 名称=%s 三档积分=%d/%d/%d",
+                "id=%d 类型=%s 名称=%s 三档积分=%.2f/%.2f/%.2f",
                 type.getId(), kind, type.getName(),
                 type.getBasePoints(), type.getGoodPoints(), type.getExcellentPoints()));
         return type;
@@ -59,7 +59,7 @@ public class TaskTypeService {
      */
     @Transactional
     public void update(Long id, String kind, String name, String icon, String description,
-                       Integer basePoints, Integer goodPoints, Integer excellentPoints) {
+                       Double basePoints, Double goodPoints, Double excellentPoints) {
         TaskType existing = getById(id);
         TaskType type = validateAndBuild(id, kind, name, icon, description,
                 basePoints, goodPoints, excellentPoints);
@@ -67,7 +67,7 @@ public class TaskTypeService {
         type.setEnabled(existing.isEnabled());
         taskTypeRepository.update(type);
         OpsLogger.log("编辑任务类型", String.format(
-                "id=%d 类型=%s 名称=%s 三档积分=%d/%d/%d",
+                "id=%d 类型=%s 名称=%s 三档积分=%.2f/%.2f/%.2f",
                 id, kind, type.getName(),
                 type.getBasePoints(), type.getGoodPoints(), type.getExcellentPoints()));
     }
@@ -76,7 +76,7 @@ public class TaskTypeService {
      * 校验并构建 TaskType。id 为 null 时用于新建，否则用于编辑（名称唯一性排除自身）。
      */
     private TaskType validateAndBuild(Long id, String kind, String name, String icon, String description,
-                                      Integer basePoints, Integer goodPoints, Integer excellentPoints) {
+                                      Double basePoints, Double goodPoints, Double excellentPoints) {
         if (!"POSITIVE".equals(kind) && !"NEGATIVE".equals(kind)) {
             throw new IllegalArgumentException("请选择类型：正向任务或惩罚项");
         }

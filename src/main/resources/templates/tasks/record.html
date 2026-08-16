@@ -39,7 +39,7 @@
                                     th:data-base="${t.basePoints}"
                                     th:data-good="${t.goodPoints}"
                                     th:data-excellent="${t.excellentPoints}"
-                                    th:text="${t.icon} + ' ' + ${t.name} + '（' + ${t.basePoints} + '/' + ${t.goodPoints} + '/' + ${t.excellentPoints} + '）'"></option>
+                                    th:text="${t.icon} + ' ' + ${t.name} + '（' + ${@pointFormat.fmt(t.basePoints)} + '/' + ${@pointFormat.fmt(t.goodPoints)} + '/' + ${@pointFormat.fmt(t.excellentPoints)} + '）'"></option>
                         </select>
 
                         <div class="mt-2" id="positiveCustomFields" style="display:none">
@@ -48,15 +48,15 @@
                             <div class="row g-2">
                                 <div class="col-4">
                                     <label class="form-label small text-muted">完成档</label>
-                                    <input type="number" class="form-control" name="positiveBasePoints" min="0" value="0">
+                                    <input type="number" class="form-control" name="positiveBasePoints" min="0" step="0.01" value="0">
                                 </div>
                                 <div class="col-4">
                                     <label class="form-label small text-muted">良好档</label>
-                                    <input type="number" class="form-control" name="positiveGoodPoints" min="0" value="0">
+                                    <input type="number" class="form-control" name="positiveGoodPoints" min="0" step="0.01" value="0">
                                 </div>
                                 <div class="col-4">
                                     <label class="form-label small text-muted">优秀档</label>
-                                    <input type="number" class="form-control" name="positiveExcellentPoints" min="0" value="0">
+                                    <input type="number" class="form-control" name="positiveExcellentPoints" min="0" step="0.01" value="0">
                                 </div>
                             </div>
                         </div>
@@ -89,7 +89,7 @@
                             <option th:each="t : ${negativeTypes}"
                                     th:value="${t.id}"
                                     th:data-points="${t.basePoints}"
-                                    th:text="${t.icon} + ' ' + ${t.name} + '（-' + ${t.basePoints} + '）'"></option>
+                                    th:text="${t.icon} + ' ' + ${t.name} + '（-' + ${@pointFormat.fmt(t.basePoints)} + '）'"></option>
                         </select>
 
                         <div class="mt-2" id="negativeCustomFields" style="display:none">
@@ -98,7 +98,7 @@
                             <div class="row g-2">
                                 <div class="col-6">
                                     <label class="form-label small text-muted">单次扣分</label>
-                                    <input type="number" class="form-control" name="negativePoints" min="1" value="5">
+                                    <input type="number" class="form-control" name="negativePoints" min="1" step="0.01" value="5">
                                 </div>
                             </div>
                         </div>
@@ -136,6 +136,11 @@
         });
     });
 
+    // 去尾零显示：5.0 → "5"，5.5 → "5.5"
+    function numText(s) {
+        return s === '' || s == null ? '' : String(parseFloat(s));
+    }
+
     function updatePositivePreview() {
         let base = '', good = '', excellent = '';
         const customFields = document.getElementById('positiveCustomFields');
@@ -151,9 +156,9 @@
             good = opt.dataset.good;
             excellent = opt.dataset.excellent;
         }
-        document.getElementById('tier1Pts').textContent = base !== '' ? '+' + base : '';
-        document.getElementById('tier2Pts').textContent = good !== '' ? '+' + good : '';
-        document.getElementById('tier3Pts').textContent = excellent !== '' ? '+' + excellent : '';
+        document.getElementById('tier1Pts').textContent = base !== '' ? '+' + numText(base) : '';
+        document.getElementById('tier2Pts').textContent = good !== '' ? '+' + numText(good) : '';
+        document.getElementById('tier3Pts').textContent = excellent !== '' ? '+' + numText(excellent) : '';
     }
 
     function updateNegativePreview() {
@@ -166,7 +171,7 @@
             customFields.style.display = 'none';
             pts = negTypeSel.selectedOptions[0].dataset.points;
         }
-        document.getElementById('negativePreview').textContent = pts ? '-' + pts + ' 分' : '';
+        document.getElementById('negativePreview').textContent = pts ? '-' + numText(pts) + ' 分' : '';
     }
 
     posTypeSel.addEventListener('change', updatePositivePreview);

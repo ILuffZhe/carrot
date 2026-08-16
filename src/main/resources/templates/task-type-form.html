@@ -44,24 +44,24 @@
                 <div class="row g-2" id="positivePointsFields">
                     <div class="col-4">
                         <label class="form-label small text-muted">完成档积分</label>
-                        <input type="number" class="form-control" name="basePoints" min="0"
+                        <input type="number" class="form-control" name="basePoints" min="0" step="0.01"
                                th:value="${type.id == null ? 5 : type.basePoints}">
                     </div>
                     <div class="col-4">
                         <label class="form-label small text-muted">良好档积分</label>
-                        <input type="number" class="form-control" name="goodPoints" min="0"
+                        <input type="number" class="form-control" name="goodPoints" min="0" step="0.01"
                                th:value="${type.id == null ? 6 : type.goodPoints}">
                     </div>
                     <div class="col-4">
                         <label class="form-label small text-muted">优秀档积分</label>
-                        <input type="number" class="form-control" name="excellentPoints" min="0"
+                        <input type="number" class="form-control" name="excellentPoints" min="0" step="0.01"
                                th:value="${type.id == null ? 8 : type.excellentPoints}">
                     </div>
                 </div>
                 <div class="row g-2" id="negativePointsFields" style="display:none">
                     <div class="col-4">
                         <label class="form-label small text-muted">单次扣分</label>
-                        <input type="number" class="form-control" name="basePoints" min="1"
+                        <input type="number" class="form-control" name="basePoints" min="1" step="0.01"
                                th:value="${type.id == null ? 5 : type.basePoints}" disabled>
                     </div>
                 </div>

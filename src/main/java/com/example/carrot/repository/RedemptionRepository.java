@@ -48,7 +48,7 @@ public class RedemptionRepository {
                     new String[]{"id"});
             ps.setLong(1, redemption.getRewardId());
             ps.setString(2, redemption.getRewardName());
-            ps.setInt(3, redemption.getPointsCost());
+            ps.setDouble(3, redemption.getPointsCost());
             ps.setString(4, redemption.getCreatedBy());
             return ps;
         }, keyHolder);

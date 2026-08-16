@@ -41,9 +41,9 @@ public class TaskRepository {
             ps.setObject(1, task.getTaskTypeId());
             ps.setString(2, task.getTitle());
             ps.setString(3, task.getDescription());
-            ps.setInt(4, task.getBasePoints());
-            ps.setInt(5, task.getGoodPoints());
-            ps.setInt(6, task.getExcellentPoints());
+            ps.setDouble(4, task.getBasePoints());
+            ps.setDouble(5, task.getGoodPoints());
+            ps.setDouble(6, task.getExcellentPoints());
             ps.setString(7, task.getStatus());
             ps.setObject(8, task.getTier());
             ps.setObject(9, task.getEarnedPoints());

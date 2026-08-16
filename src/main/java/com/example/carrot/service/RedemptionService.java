@@ -5,6 +5,7 @@ import com.example.carrot.model.Redemption;
 import com.example.carrot.model.Reward;
 import com.example.carrot.repository.RedemptionRepository;
 import com.example.carrot.repository.RewardRepository;
+import com.example.carrot.util.PointFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,13 +21,16 @@ public class RedemptionService {
     private final RedemptionRepository redemptionRepository;
     private final RewardRepository rewardRepository;
     private final PointService pointService;
+    private final PointFormat pointFormat;
 
     public RedemptionService(RedemptionRepository redemptionRepository,
                              RewardRepository rewardRepository,
-                             PointService pointService) {
+                             PointService pointService,
+                             PointFormat pointFormat) {
         this.redemptionRepository = redemptionRepository;
         this.rewardRepository = rewardRepository;
         this.pointService = pointService;
+        this.pointFormat = pointFormat;
     }
 
     @Transactional(readOnly = true)
@@ -51,10 +55,10 @@ public class RedemptionService {
         if (reward.getStock() != null && reward.getStock() <= 0) {
             throw new IllegalArgumentException("该奖励已无库存");
         }
-        int balance = pointService.getCurrentBalance();
+        double balance = pointService.getCurrentBalance();
         if (balance < reward.getPointsCost()) {
             throw new IllegalArgumentException(
-                    "积分不足，还差 " + (reward.getPointsCost() - balance) + " 分");
+                    "积分不足，还差 " + pointFormat.fmt(reward.getPointsCost() - balance) + " 分");
         }
 
         Redemption redemption = new Redemption();
@@ -68,7 +72,7 @@ public class RedemptionService {
         pointService.add(-reward.getPointsCost(), "REDEEM", redemption.getId(),
                 "兑换：" + reward.getName());
         OpsLogger.log("发起兑换", String.format(
-                "id=%d 奖励=%s 积分=%d", redemption.getId(), reward.getName(), reward.getPointsCost()));
+                "id=%d 奖励=%s 积分=%.2f", redemption.getId(), reward.getName(), reward.getPointsCost()));
         return redemption;
     }
 
@@ -83,7 +87,7 @@ public class RedemptionService {
         }
         redemptionRepository.updateStatus(id, "DONE");
         OpsLogger.log("兑换发放", String.format(
-                "id=%d 奖励=%s 积分=%d", id, redemption.getRewardName(), redemption.getPointsCost()));
+                "id=%d 奖励=%s 积分=%.2f", id, redemption.getRewardName(), redemption.getPointsCost()));
     }
 
     /**

@@ -8,7 +8,7 @@ public class Reward {
     private Long id;
     private String name;
     private String description;
-    private int pointsCost;     // 所需积分
+    private double pointsCost;  // 所需积分
     private String type;        // PHYSICAL=实物 / ACTIVITY=活动
     private String imagePath;   // 相对路径，可空
     private Integer stock;      // NULL=不限量
@@ -39,11 +39,11 @@ public class Reward {
         this.description = description;
     }
 
-    public int getPointsCost() {
+    public double getPointsCost() {
         return pointsCost;
     }
 
-    public void setPointsCost(int pointsCost) {
+    public void setPointsCost(double pointsCost) {
         this.pointsCost = pointsCost;
     }
 

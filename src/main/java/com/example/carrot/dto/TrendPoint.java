@@ -6,9 +6,9 @@ package com.example.carrot.dto;
 public class TrendPoint {
 
     private String date;
-    private int income;
-    private int deduction;
-    private int net;
+    private double income;
+    private double deduction;
+    private double net;
 
     public String getDate() {
         return date;
@@ -18,27 +18,27 @@ public class TrendPoint {
         this.date = date;
     }
 
-    public int getIncome() {
+    public double getIncome() {
         return income;
     }
 
-    public void setIncome(int income) {
+    public void setIncome(double income) {
         this.income = income;
     }
 
-    public int getDeduction() {
+    public double getDeduction() {
         return deduction;
     }
 
-    public void setDeduction(int deduction) {
+    public void setDeduction(double deduction) {
         this.deduction = deduction;
     }
 
-    public int getNet() {
+    public double getNet() {
         return net;
     }
 
-    public void setNet(int net) {
+    public void setNet(double net) {
         this.net = net;
     }
 }

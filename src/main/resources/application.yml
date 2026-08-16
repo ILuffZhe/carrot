@@ -41,3 +41,5 @@ carrot:
   upload-dir: ./uploads
   # 记住我令牌签名密钥（家庭内网单机使用，默认值足够；如需可改为任意随机串）
   remember-me-key: carrot-home-remember-me-key
+  # 账户积分的年化利率（按天复利，日利率 = 年化/365）；0.02 = 年化 2%
+  interest-rate: 0.02

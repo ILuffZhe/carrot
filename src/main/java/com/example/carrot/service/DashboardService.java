@@ -20,23 +20,27 @@ import java.util.Map;
 @Service
 public class DashboardService {
 
+    private final PointService pointService;
     private final PointRepository pointRepository;
     private final TaskRepository taskRepository;
     private final RedemptionRepository redemptionRepository;
 
-    public DashboardService(PointRepository pointRepository,
+    public DashboardService(PointService pointService,
+                            PointRepository pointRepository,
                             TaskRepository taskRepository,
                             RedemptionRepository redemptionRepository) {
+        this.pointService = pointService;
         this.pointRepository = pointRepository;
         this.taskRepository = taskRepository;
         this.redemptionRepository = redemptionRepository;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public DashboardStats stats() {
         LocalDate today = LocalDate.now();
         DashboardStats stats = new DashboardStats();
-        stats.setCurrentBalance(pointRepository.getCurrentBalance());
+        // 走 PointService 以触发利息结算
+        stats.setCurrentBalance(pointService.getCurrentBalance());
         stats.setTodayPositiveCount(taskRepository.countByDateAndTier(today.toString(), true));
         stats.setTodayNegativeCount(taskRepository.countByDateAndTier(today.toString(), false));
         stats.setTodayNetChange(pointRepository.sumChangeOn(today.toString()));
