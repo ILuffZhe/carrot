@@ -49,9 +49,27 @@ public class TaskTypeRepository {
     }
 
     public boolean existsByNameAndKind(String name, String kind) {
-        Integer count = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM task_types WHERE name = ? AND kind = ?", Integer.class, name, kind);
+        return existsByNameAndKindExcluding(name, kind, null);
+    }
+
+    /**
+     * 是否存在同名同类型的记录，可排除指定 id（编辑时用于排除自身）。
+     */
+    public boolean existsByNameAndKindExcluding(String name, String kind, Long excludeId) {
+        String sql = "SELECT COUNT(*) FROM task_types WHERE name = ? AND kind = ?";
+        if (excludeId != null) {
+            sql += " AND id != " + excludeId;
+        }
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, name, kind);
         return count != null && count > 0;
+    }
+
+    public void update(TaskType type) {
+        jdbcTemplate.update(
+                "UPDATE task_types SET name = ?, kind = ?, description = ?, icon = ?, "
+              + "base_points = ?, good_points = ?, excellent_points = ? WHERE id = ?",
+                type.getName(), type.getKind(), type.getDescription(), type.getIcon(),
+                type.getBasePoints(), type.getGoodPoints(), type.getExcellentPoints(), type.getId());
     }
 
     public Long insert(TaskType type) {
